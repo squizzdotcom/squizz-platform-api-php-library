@@ -1,0 +1,101 @@
+<?php
+	/**
+	* Copyright (C) 2017 Squizz PTY LTD
+	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
+	*/
+	namespace org\squizz\api\v1\endpoint;
+	use org\esd\EcommerceStandardsDocuments\ESDocument;
+	use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
+
+	/**
+	* Represents the response returned from an endpoint in the platform's API
+	*/
+	class APIv1EndpointResponse extends ESDocument
+	{
+		const ENDPOINT_RESULT_SUCCESS = "SUCCESS";
+		const ENDPOINT_RESULT_FAILURE = "FAILURE";
+		const ENDPOINT_RESULT_CODE_ERROR_UNKNOWN = "SERVER_ERROR_UNKNOWN";
+		const ENDPOINT_RESULT_CODE_ERROR_MALFORMED_URL = "SERVER_ERROR_MALFORMED_URL";
+		const ENDPOINT_RESULT_CODE_ERROR_RESPONSE = "SERVER_ERROR_RESPONSE";
+		const ENDPOINT_RESULT_CODE_ERROR_REQUEST_PROTOCOL = "SERVER_ERROR_REQUEST_PROTOCOL";
+		const ENDPOINT_RESULT_CODE_ERROR_CONNECTION = "SERVER_ERROR_CONNECTION";
+		const ENDPOINT_RESULT_CODE_ERROR_IO = "SERVER_ERROR_IO";
+		const ENDPOINT_RESULT_CODE_ERROR_ORG_NOT_FOUND = "SERVER_ERROR_ORG_NOT_FOUND";
+		const ENDPOINT_RESULT_CODE_ERROR_INCORRECT_API_CREDENTIALS = "SERVER_ERROR_INCORRECT_API_CREDENTIALS";
+		const ENDPOINT_RESULT_CODE_ERROR_ORG_INACTIVE = "SERVER_ERROR_ORG_INACTIVE";
+		const ENDPOINT_RESULT_CODE_ERROR_SESSION_INVALID = "SERVER_ERROR_SESSION_INVALID";
+		const ENDPOINT_RESULT_CODE_ERROR_INVALID_NOTIFICATION_CATEGORY = "SERVER_ERROR_INVALID_NOTIFICATION_CATEGORY";
+		const ENDPOINT_RESULT_CODE_ERROR_NO_ORG_PEOPLE_TO_NOTIFY = "SERVER_ERROR_NO_ORG_PEOPLE_TO_NOTIFY";
+		const ENDPOINT_RESULT_CODE_ERROR_INSUFFICIENT_CREDIT = "SERVER_ERROR_INSUFFICIENT_CREDIT";
+		const ENDPOINT_RESULT_CODE_ERROR_SECURITY_CERTIFICATE_NOT_FOUND = "SERVER_ERROR_SECURITY_CERTIFICATE_NOT_FOUND";
+		const ENDPOINT_RESULT_CODE_ERROR_SENDER_DOES_NOT_MATCH_CERTIFICATE_COMMON_NAME = "SERVER_ERROR_SENDER_DOES_NOT_MATCH_CERTIFICATE_COMMON_NAME";
+		const ENDPOINT_RESULT_CODE_ERROR_INVALID_API_ACTION = "SERVER_ERROR_INVALID_API_ACTION";
+		const ENDPOINT_RESULT_CODE_ERROR_PERMISSION_DENIED = "SERVER_ERROR_PERMISSION_DENIED";
+		
+		//import esd server errors
+		const ENDPOINT_RESULT_CODE_ERROR_DATA_IMPORT_MISSING_IMPORT_TYPE = "SERVER_ERROR_DATA_IMPORT_MISSING_IMPORT_TYPE";
+		const ENDPOINT_RESULT_CODE_ERROR_DATA_IMPORT_MAX_IMPORTS_RUNNING = "SERVER_ERROR_DATA_IMPORT_MAX_IMPORTS_RUNNING";
+		const ENDPOINT_RESULT_CODE_ERROR_DATA_IMPORT_BUSY = "SERVER_ERROR_DATA_IMPORT_BUSY";
+		const ENDPOINT_RESULT_CODE_ERROR_DATA_IMPORT_NOT_FOUND = "SERVER_ERROR_DATA_IMPORT_NOT_FOUND"; 
+		const ENDPOINT_RESULT_CODE_ERROR_DATA_JSON_WRONG_CONTENT_TYPE = "SERVER_ERROR_DATA_JSON_WRONG_CONTENT_TYPE";
+		const ENDPOINT_RESULT_CODE_ERROR_DATA_JSON_MALFORMED = "SERVER_ERROR_DATA_JSON_MALFORMED";
+		const ENDPOINT_RESULT_CODE_ERROR_ESD_DOCUMENT_HEADER_MALFORMED = "SERVER_ERROR_ESD_DOCUMENT_HEADER_MALFORMED";
+		const ENDPOINT_RESULT_CODE_ERROR_ESD_DOCUMENT_HEADER_MISSING_ATTRIBUTES = "SERVER_ERROR_ESD_DOCUMENT_HEADER_MISSING_ATTRIBUTES";
+		const ENDPOINT_RESULT_CODE_ERROR_DATA_IMPORT_ABORTED = "SERVER_ERROR_DATA_IMPORT_ABORTED";
+		const ENDPOINT_RESULT_CODE_ERROR_ESD_DOCUMENT_UNSUCCESSFUL = "SERVER_ERROR_ESD_DOCUMENT_UNSUCCESSFUL";
+		const ENDPOINT_RESULT_CODE_ERROR_ESD_DOCUMENT_NO_RECORD = "SERVER_ERROR_ESD_DOCUMENT_NO_RECORD";
+		
+		const ENDPOINT_RESULT_CODE_ERROR_ORG_DOES_NOT_EXIST = "SERVER_ERROR_ORG_DOES_NOT_EXIST";
+		const ENDPOINT_RESULT_CODE_ERROR_ORG_NOT_SELLING = "SERVER_ERROR_ORG_NOT_SELLING";
+		const ENDPOINT_RESULT_CODE_ERROR_ORG_NOT_ENOUGH_CREDITS = "SERVER_ERROR_ORG_NOT_ENOUGH_CREDITS";
+		const ENDPOINT_RESULT_CODE_ERROR_NO_ORG_CUSTOMER_ACCOUNT_SET = "SERVER_ERROR_NO_ORG_CUSTOMER_ACCOUNT_SET";
+		const ENDPOINT_RESULT_CODE_ERROR_NO_ORG_CUSTOMER_ACCOUNT_ASSIGNED = "SERVER_ERROR_NO_ORG_CUSTOMER_ACCOUNT_ASSIGNED";
+		const ENDPOINT_RESULT_CODE_ERROR_CUSTOMER_ACCOUNT_NO_ACCOUNT_PAYMENT_TYPE = "SERVER_ERROR_CUSTOMER_ACCOUNT_NO_ACCOUNT_PAYMENT_TYPE";
+		const ENDPOINT_RESULT_CODE_ERROR_ORDER_PRODUCT_NOT_MAPPED = "SERVER_ERROR_ORDER_PRODUCT_NOT_MAPPED";
+		const ENDPOINT_RESULT_CODE_ERROR_ORDER_MAPPED_PRODUCT_PRICE_NOT_FOUND = "SERVER_ERROR_ORDER_MAPPED_PRODUCT_PRICE_NOT_FOUND";
+		const ENDPOINT_RESULT_CODE_ERROR_CUSTOMER_ACCOUNT_ON_HOLD = "SERVER_ERROR_CUSTOMER_ACCOUNT_ON_HOLD";
+		const ENDPOINT_RESULT_CODE_ERROR_CUSTOMER_ACCOUNT_OUTSIDE_BALANCE_LIMIT = "SERVER_ERROR_CUSTOMER_ACCOUNT_OUTSIDE_BALANCE_LIMIT";
+		const ENDPOINT_RESULT_CODE_ERROR_INCORRECT_DATA_TYPE = "SERVER_ERROR_INCORRECT_DATA_TYPE";
+		
+		//set default values for the response
+		public $result = self::ENDPOINT_RESULT_FAILURE;
+		public $result_code = self::ENDPOINT_RESULT_CODE_ERROR_UNKNOWN;
+		public $result_message = "";
+		public $api_version = "1.0.0.0";
+		public $session_id = "";
+		public $session_valid = "";
+	
+		/**
+		* deserializes an array and gets the values from a JSON object and sets them into the properties of the value
+		* @param encodedDataArray	gets an array from 
+		*/
+		public function jsonDeserialize($encodedDataArray)
+		{
+			if(array_key_exists("result", $encodedDataArray)){
+				$this->result = $encodedDataArray["result"];
+			}
+			
+			if(array_key_exists("result_code", $encodedDataArray)){
+				$this->result_code = $encodedDataArray["result_code"];
+			}
+			
+			if(array_key_exists("result_message", $encodedDataArray)){
+				$this->result_message = $encodedDataArray["result_message"];
+			}
+			
+			if(array_key_exists("api_version", $encodedDataArray)){
+				$this->api_version = $encodedDataArray["api_version"];
+			}
+			
+			if(array_key_exists("session_id", $encodedDataArray)){
+				$this->session_id = $encodedDataArray["session_id"];
+			}
+			
+			if(array_key_exists("session_valid", $encodedDataArray)){
+				$this->session_valid = $encodedDataArray["session_valid"];
+			}
+		}
+	}
+?>
