@@ -131,7 +131,7 @@
 		{
 			$endpointResponse = new APIv1EndpointResponse();
 			$endpointParams = "";
-			$requestHeaders = array(APIv1HTTPRequest::HTTP_HEADER_CONTENT_TYPE => APIv1HTTPRequest::HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODED);
+			$requestHeaders = array(APIv1HTTPRequest::HTTP_HEADER_CONTENT_TYPE . ": " . APIv1HTTPRequest::HTTP_HEADER_CONTENT_TYPE_FORM_URL_ENCODED);
 			
 			try{
 				//set endpoint parameters
