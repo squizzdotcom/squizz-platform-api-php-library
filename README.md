@@ -15,13 +15,35 @@ If you are a software developer writing a PHP application then we recommend that
 - To find more information about developing software for the SQUIZZ.com visit [https://www.squizz.com/docs/squizz/Integrate-Software-Into-SQUIZZ.com-Platform.html](https://www.squizz.com/docs/squizz/Integrate-Software-Into-SQUIZZ.com-Platform.html)
 - To find more information about the platform's API visit [https://www.squizz.com/docs/squizz/Platform-API.html](https://www.squizz.com/docs/squizz/Platform-API.html)
 
+## Contents
+
+  * [Getting Started](#getting-started)
+    * [Dependencies](#dependencies)
+    * [Setup](#setup)
+  * [Example Usages](#example-usages)
+    * [Create Organisation API Session Endpoint](#create-organisation-api-session-endpoint)
+    * [Send and Procure Purchase Order From Supplier Endpoint](#send-and-procure-purchase-order-from-supplier-endpoint)
+    * [Create Organisation Notification Endpoint](#create-organisation-notification-endpoint)
+    * [Validate Organisation API Session Endpoint](#validate-organisation-api-session-endpoint)
+    * [Validate/Create Organisation API Session Endpoint](#validatecreate-organisation-api-session-endpoint)
+    * [Destroy Organisation API Session Endpoint](#destroy-organisation-api-session-endpoint)
+
 ## Getting Started
 
-To get started using the library within PHP applications, clone or download the PHP API library and its dependent libraries from the [Release page](https://github.com/squizzdotcom/squizz-platform-api-php-library/releases) and add references to the PHP libraries in your application using your most preferred way.
-The library contains dependencies on the CURL application which for debian linux based operating systems can be downloaded using a package for PHP5 apt-get install php5-curl, or for later version of PHP installing apt-get install php-curl.
-The library also contains a dependency on the [Ecommerce Standards Documents PHP Library](https://github.com/squizzdotcom/ecommerce-standards-documents-php-library)
+### Dependencies
 
-## Create Organisation API Session Endpoint
+To get started using the library within PHP applications it relies on a number of dependencies being installed on your machine running your PHP application:
+ * [CURL](https://curl.haxx.se) needs to be installed on the operating system that is running your PHP code. CURL is used by this API library to make HTTP requests to the platform's API. For Debian linux based operating systems CURL can be downloaded using its package manager. To install CURL for PHP5 run the command: apt-get install php5-curl . For later versions of PHP CURL can be installed with the command: apt-get install php-curl
+ * The [Ecommerce Standards Documents PHP Library](https://github.com/squizzdotcom/ecommerce-standards-documents-php-library) needs to be placed into a location on the operating system that is running your PHP code. This API library uses the Ecommerce Standards Documents to serialize and deserialize Ecommerce data coming from the SQUIZZ.com platform's API and store the data in PHP class objects.
+ * Clone or download the PHP API library and its dependent libraries from the [Release page](https://github.com/squizzdotcom/squizz-platform-api-php-library/releases) and add references to the PHP libraries in your application using your most preferred way.
+ * This PHP library depends on the JsonSerializable class made available in PHP versions 5.4 and later. If you are running an earlier version of PHP you may need to add the JsonSerializable class to your autoloader, such as one found at [php5.3-compatibility](https://github.com/packfire/php5.3-compatibility)
+ 
+### Setup
+
+Once CURL, the Ecommerce Standards Document PHP library, and this library have been placed onto the computer running your PHP code, to use this API library add references to it in your autoloader class, or any other way you load php classes included in your PHP application. Ensure that both the Ecommerce Standards Document classes and this API's library php classes can be loaded in your application. See examples below on how this could be done, and how to start using this library to call the SQUIZZ.com API's various endpoints to pass, or receive data.
+
+## Example Usages
+### Create Organisation API Session Endpoint
 To start using the SQUIZZ.com platform's API a session must first be created. A session can only be created after credentials for a specified organisation have been given to the API and have been verified.
 Once the session has been created then all other endpoints in the API can be called.
 Read [https://www.squizz.com/docs/squizz/Platform-API.html#section840](https://www.squizz.com/docs/squizz/Platform-API.html#section840) for more documentation about the endpoint.
@@ -100,7 +122,7 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section840](https://w
 ?>
 ```
 
-## Send and Procure Purchase Order From Supplier Endpoint
+### Send and Procure Purchase Order From Supplier Endpoint
 
 The SQUIZZ.com platform's API has an endpoint that allows an orgnisation to import a purchase order. and have it procured/converted into a sales order of a designated supplier organisation. 
 This endpoint allows a customer organisation to commit to buy goods and services of an organisation, and have the order processed, and delivered by the supplier organisation.
@@ -329,7 +351,7 @@ See the example below on how the call the Send and Procure Purchase order From S
 ?>
 ```
 
-## Create Organisation Notification Endpoint
+### Create Organisation Notification Endpoint
 The SQUIZZ.com platform's API has an endpoint that allows organisation notifications to be created in the platform. allowing people assigned to an organisation's notification category to receive a notification. 
 This can be used to advise such people of events happening external to the platform, such as sales, enquires, tasks completed through websites and other software.
 See the example below on how the call the Create Organisation Notification endpoint. Note that a session must first be created in the API before calling the endpoint.
@@ -438,7 +460,7 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section854](https://w
 ?>
 ```
 
-## Validate Organisation API Session Endpoint
+### Validate Organisation API Session Endpoint
 
 After a session has been created with SQUIZZ.com platform's API, if the same session is persistently being used over a long period time, then its worth validating that the session has not been destroyed by the API.
 The SQUIZZ.com platform's API will automatically expire and destory sessions that have existed for a long period of time.
@@ -529,7 +551,7 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section842](https://w
 ?>
 ```
 
-## Validate/Create Organisation API Session Endpoint
+### Validate/Create Organisation API Session Endpoint
 
 After a session has been created with SQUIZZ.com platform's API, if the same session is persistently being used over a long period time, then a helper method in the library can be used to check if the API session is still valid, then if not have a new session be created.
 The SQUIZZ.com platform's API will automatically expire and destory sessions that have existed for a long period of time.
@@ -626,7 +648,7 @@ The SQUIZZ.com platform's API will automatically expire and destory sessions tha
 ?>
 ```
 
-## Destroy Organisation API Session Endpoint
+### Destroy Organisation API Session Endpoint
 
 After a session has been created with SQUIZZ.com platform's API, if after calling other endpoints there no need for the session anymore, then it's advisable to destroy the session as soon as possible.
 Read [https://www.squizz.com/docs/squizz/Platform-API.html#section841](https://www.squizz.com/docs/squizz/Platform-API.html#section841) for more documentation about the endpoint.
