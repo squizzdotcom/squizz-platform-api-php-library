@@ -30,8 +30,9 @@
 						}
 						$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 						
-						$apiNamespace = "org\\squizz\\api\\v1";
-						$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+						$apiNamespace = "squizz\\api\\v1";
+						$esdNamespace = "EcommerceStandardsDocuments";
+						$esdInstallPath = "/opt/squizz/esd-php-library/src/";
 						
 						//set absolute path to API php class files
 						if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -39,15 +40,15 @@
 						}
 						//set absolute path to ESD library files
 						else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-							$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+							$fileName = $esdInstallPath . $fileName;
 						}
 						
 						require $fileName;
 					});
 					
-					use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-					use org\squizz\api\v1\APIv1OrgSession;
-					use org\squizz\api\v1\APIv1Constants;
+					use squizz\api\v1\endpoint\APIv1EndpointResponse;
+					use squizz\api\v1\APIv1OrgSession;
+					use squizz\api\v1\APIv1Constants;
 					
 					
 					//obtain or load in an organisation's API credentials, in this example from command line arguments

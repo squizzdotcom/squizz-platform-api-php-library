@@ -5,7 +5,7 @@
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
 	*/
-	namespace org\squizz\api\v1;
+	namespace squizz\api\v1;
 
 	/**
 	* Stores constant variables required for accessing the platform's API
@@ -101,10 +101,5 @@
 		* English australian locale that the API supports returning messages in
 		*/
 		const SUPPORTED_LOCALES_EN_AU = "en_AU";
-		
-		/**
-		* Name of the package that contains the language bundles used for storing locale languages
-		*/
-		const LANG_BUNDLE_NAME = "org.squizz.api.v1.lang.APIv1LangBundle";
 	}
 ?>

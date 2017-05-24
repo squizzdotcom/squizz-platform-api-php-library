@@ -5,15 +5,14 @@
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
 	*/
-	namespace org\squizz\api\v1;
+	namespace squizz\api\v1;
 
- 	use org\esd\EcommerceStandardsDocuments\ESDocumentConstants;
-	use org\esd\EcommerceStandardsDocuments\ESDocument;
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-	use org\squizz\api\v1\APIv1Constants;
-	use org\squizz\api\v1\lang\IAPIv1LangBundle;
-	//import org.esd.EcommerceStandardsDocuments.*;
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+ 	use EcommerceStandardsDocuments\ESDocumentConstants;
+	use EcommerceStandardsDocuments\ESDocument;
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\APIv1Constants;
+	use squizz\api\v1\lang\IAPIv1LangBundle;
+	use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
 
 	/**
 	* A generic class that can be used to send HTTP requests to the platform's API and return HTTP a response as an endpoint object

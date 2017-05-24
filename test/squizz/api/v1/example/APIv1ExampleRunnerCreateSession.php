@@ -7,9 +7,10 @@
 			<div>SQUIZZ Pty Ltd</div>
 			<div>Testing SQUIZZ.com API PHP Library: version 1</div>
 			<hr style="max-width: 607px"/>
-			<h1>Validate/Create API Session Example</h1>
-			<p>Tests making a request to the SQUIZZ.com API to create a session for an organisation then makes a call to the API validate that the session still exists. If the session no longer exists after validation then a new session will attempted to be created.</p>
+			<h1>Create API Session Example</h1>
+			<p>Tests making a request to the SQUIZZ.com API to create a session for an organisation.</p>
 			<div style="max-width: 607px; background-color: #2b2b2b; color: #cacaca; text-align: center; margin: auto; padding-top: 15px;">
+			
 				<?php
 					/**
 					* Copyright (C) 2017 Squizz PTY LTD
@@ -30,8 +31,9 @@
 						}
 						$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 						
-						$apiNamespace = "org\\squizz\\api\\v1";
-						$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+						$apiNamespace = "squizz\\api\\v1";
+						$esdNamespace = "EcommerceStandardsDocuments";
+						$esdInstallPath = "/opt/squizz/esd-php-library/src/";
 						
 						//set absolute path to API php class files
 						if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -39,17 +41,16 @@
 						}
 						//set absolute path to ESD library files
 						else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-							$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+							$fileName = $esdInstallPath . $fileName;
 						}
 						
 						require $fileName;
 					});
 					
-					use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-					use org\squizz\api\v1\APIv1OrgSession;
-					use org\squizz\api\v1\APIv1Constants;
-					
-					
+					use squizz\api\v1\endpoint\APIv1EndpointResponse;
+					use squizz\api\v1\APIv1OrgSession;
+					use squizz\api\v1\APIv1Constants;
+
 					//obtain or load in an organisation's API credentials, in this example from command line arguments
 					$orgID = $_GET["orgID"];
 					$orgAPIKey = $_GET["orgAPIKey"];
@@ -69,6 +70,9 @@
 					$resultMessage = "";
 					if($endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
 					{
+						//session has been created so now can call other API endpoints
+						$result = "SUCCESS";
+						$resultMessage = "API session has successfully been created.";
 					}
 					else
 					{
@@ -76,22 +80,9 @@
 						$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 					}
 					
-					//check if the session still is valid, if not have a new session created with the same organisation API credentials
-					$endpointResponse = $apiOrgSession->validateCreateOrgSession();
-					
-					//check the result of validating or creating a new session
-					if($endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
-						$result = "SUCCESS";
-						$resultMessage = "API session has successfully been validated.";
-					}else{
-						//session failed to be validated
-						$resultMessage = "API session failed to be validated. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
-					}
-					
 					//next steps
-					//call other API endpoints...
+					//call API endpoints...
 					//destroy API session when done...
-					$apiOrgSession->destroyOrgSession();
 					
 					echo "<div>Result:<div>";
 					echo "<div><b>$result</b><div><br/>";

@@ -19,7 +19,6 @@
 					*/
 					
 					//set automatic loader of the library's classes
-					require_once __DIR__ . '/../../../../../../3rd-party/jsonmapper/JsonMapper.php';
 					spl_autoload_register(function($className) {
 						$className = ltrim($className, '\\');
 						$fileName  = '';
@@ -31,8 +30,9 @@
 						}
 						$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 						
-						$apiNamespace = "org\\squizz\\api\\v1";
-						$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+						$apiNamespace = "squizz\\api\\v1";
+						$esdNamespace = "EcommerceStandardsDocuments";
+						$esdInstallPath = "/opt/squizz/esd-php-library/src/";
 						
 						//set absolute path to API php class files
 						if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -40,22 +40,22 @@
 						}
 						//set absolute path to ESD library files
 						else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-							$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+							$fileName = $esdInstallPath . $fileName;
 						}
 						
 						require $fileName;
 					});
 					
-					use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-					use org\squizz\api\v1\endpoint\APIv1EndpointResponseESD;
-					use org\squizz\api\v1\endpoint\APIv1EndpointOrgProcurePurchaseOrderFromSupplier;
-					use org\squizz\api\v1\APIv1OrgSession;
-					use org\squizz\api\v1\APIv1Constants;
-					use org\esd\EcommerceStandardsDocuments\ESDRecordOrderPurchase;
-					use org\esd\EcommerceStandardsDocuments\ESDRecordOrderPurchaseLine;
-					use org\esd\EcommerceStandardsDocuments\ESDocumentConstants;
-					use org\esd\EcommerceStandardsDocuments\ESDocumentOrderSale;
-					use org\esd\EcommerceStandardsDocuments\ESDocumentOrderPurchase;
+					use squizz\api\v1\endpoint\APIv1EndpointResponse;
+					use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+					use squizz\api\v1\endpoint\APIv1EndpointOrgProcurePurchaseOrderFromSupplier;
+					use squizz\api\v1\APIv1OrgSession;
+					use squizz\api\v1\APIv1Constants;
+					use EcommerceStandardsDocuments\ESDRecordOrderPurchase;
+					use EcommerceStandardsDocuments\ESDRecordOrderPurchaseLine;
+					use EcommerceStandardsDocuments\ESDocumentConstants;
+					use EcommerceStandardsDocuments\ESDocumentOrderSale;
+					use EcommerceStandardsDocuments\ESDocumentOrderPurchase;
 					
 					//obtain or load in an organisation's API credentials, in this example from command line arguments
 					$orgID = $_GET["orgID"];

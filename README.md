@@ -40,8 +40,9 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section840](https://w
 		}
 		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 		
-		$apiNamespace = "org\\squizz\\api\\v1";
-		$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/path/to/esd-php-library/src/";
 		
 		//set absolute path to API php class files
 		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -49,15 +50,15 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section840](https://w
 		}
 		//set absolute path to ESD library files
 		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-			$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+			$fileName = $esdInstallPath . $fileName;
 		}
 		
 		require $fileName;
 	});
 	
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-	use org\squizz\api\v1\APIv1OrgSession;
-	use org\squizz\api\v1\APIv1Constants;
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
 
 	//obtain or load in an organisation's API credentials, in this example from command line arguments
 	$orgID = $_GET["orgID"];
@@ -129,8 +130,9 @@ See the example below on how the call the Send and Procure Purchase order From S
 		}
 		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 		
-		$apiNamespace = "org\\squizz\\api\\v1";
-		$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/path/to/esd-php-library/src/";
 		
 		//set absolute path to API php class files
 		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -138,22 +140,22 @@ See the example below on how the call the Send and Procure Purchase order From S
 		}
 		//set absolute path to ESD library files
 		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-			$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+			$fileName = $esdInstallPath . $fileName;
 		}
 		
 		require $fileName;
 	});
 	
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponseESD;
-	use org\squizz\api\v1\endpoint\APIv1EndpointOrgProcurePurchaseOrderFromSupplier;
-	use org\squizz\api\v1\APIv1OrgSession;
-	use org\squizz\api\v1\APIv1Constants;
-	use org\esd\EcommerceStandardsDocuments\ESDRecordOrderPurchase;
-	use org\esd\EcommerceStandardsDocuments\ESDRecordOrderPurchaseLine;
-	use org\esd\EcommerceStandardsDocuments\ESDocumentConstants;
-	use org\esd\EcommerceStandardsDocuments\ESDocumentOrderSale;
-	use org\esd\EcommerceStandardsDocuments\ESDocumentOrderPurchase;
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+	use squizz\api\v1\endpoint\APIv1EndpointOrgProcurePurchaseOrderFromSupplier;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
+	use EcommerceStandardsDocuments\ESDRecordOrderPurchase;
+	use EcommerceStandardsDocuments\ESDRecordOrderPurchaseLine;
+	use EcommerceStandardsDocuments\ESDocumentConstants;
+	use EcommerceStandardsDocuments\ESDocumentOrderSale;
+	use EcommerceStandardsDocuments\ESDocumentOrderPurchase;
 	
 	//obtain or load in an organisation's API credentials, in this example from command line arguments
 	$orgID = $_GET["orgID"];
@@ -327,6 +329,115 @@ See the example below on how the call the Send and Procure Purchase order From S
 ?>
 ```
 
+## Create Organisation Notification Endpoint
+The SQUIZZ.com platform's API has an endpoint that allows organisation notifications to be created in the platform. allowing people assigned to an organisation's notification category to receive a notification. 
+This can be used to advise such people of events happening external to the platform, such as sales, enquires, tasks completed through websites and other software.
+See the example below on how the call the Create Organisation Notification endpoint. Note that a session must first be created in the API before calling the endpoint.
+Read [https://www.squizz.com/docs/squizz/Platform-API.html#section854](https://www.squizz.com/docs/squizz/Platform-API.html#section854) for more documentation about the endpoint.
+
+
+```php
+<?php
+	//set automatic loader of the library's classes
+	spl_autoload_register(function($className) {
+		$className = ltrim($className, '\\');
+		$fileName  = '';
+		$namespace = '';
+		if ($lastNsPos = strripos($className, '\\')) {
+			$namespace = substr($className, 0, $lastNsPos);
+			$className = substr($className, $lastNsPos + 1);
+			$fileName  = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+		}
+		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/path/to/esd-php-library/src/";
+		
+		//set absolute path to API php class files
+		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
+			$fileName = $_SERVER['DOCUMENT_ROOT']. '/src/' . $fileName;
+		}
+		//set absolute path to ESD library files
+		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
+			$fileName = $esdInstallPath . $fileName;
+		}
+		
+		require $fileName;
+	});
+	
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+	use squizz\api\v1\endpoint\APIv1EndpointOrgCreateNotification;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
+	use EcommerceStandardsDocuments\ESDocumentConstants;
+	
+	//obtain or load in an organisation's API credentials, in this example from command line arguments
+	$orgID = $_GET["orgID"];
+	$orgAPIKey = $_GET["orgAPIKey"];
+	$orgAPIPass = $_GET["orgAPIPass"];
+	$supplierOrgID = $_GET["supplierOrgID"];
+	$sessionTimeoutMilliseconds = 60000;
+	
+	echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
+	
+	//create an API session instance
+	$apiOrgSession = new APIv1OrgSession($orgID, $orgAPIKey, $orgAPIPass, $sessionTimeoutMilliseconds, APIv1Constants::SUPPORTED_LOCALES_EN_AU);
+	
+	//call the platform's API to request that a session is created
+	$endpointResponse = $apiOrgSession->createOrgSession();
+	
+	//check if the organisation's credentials were correct and that a session was created in the platform's API
+	$result = "FAIL";
+	$resultMessage = "";
+	if(!$endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
+	{
+		//session failed to be created
+		$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
+	}
+	
+	//sand and procure purchsae order if the API was successfully created
+	if($apiOrgSession->sessionExists())
+	{
+		//set the notification category that the organisation will display under in the platform, in this case the sales order category
+		$notifyCategory = APIv1EndpointOrgCreateNotification::NOTIFY_CATEGORY_ORDER_SALE;
+		
+		//after 20 seconds give up on waiting for a response from the API when creating the notification
+		$timeoutMilliseconds = 20000;
+		
+		//set the message that will appear in the notification, note the placeholders {1} and {2} that will be replaced with data values
+		$message = "A new {1} was created in {2} Website";
+		
+		//set labels and links to place within the placeholders of the message
+		$linkLabels = array("Sales Order","Acme Industries");
+		$linkURLs = array("","http://www.example.com/acmeindustries");
+		
+		//call the platform's API to create the organistion notification and have people assigned to organisation's notification category receive it
+		$endpointResponseESD = APIv1EndpointOrgCreateNotification::call($apiOrgSession, $timeoutMilliseconds, $notifyCategory, $message, $linkURLs, $linkLabels);
+		
+		//check the result of procuring the purchase orders
+		if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
+			$result = "SUCCESS";
+			$resultMessage = "Organisation notification successfully created in the platform.";
+		}else{
+			$result = "FAIL";
+			$resultMessage = "Organisation notification failed to be created. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code;
+		}
+	}
+	
+	//next steps
+	//call other API endpoints...
+	//destroy API session when done...
+	$apiOrgSession->destroyOrgSession();
+	
+	echo "<div>Result:<div>";
+	echo "<div><b>$result</b><div><br/>";
+	echo "<div>Message:<div>";
+	echo "<div><b>$resultMessage</b><div><br/>";
+?>
+```
+
 ## Validate Organisation API Session Endpoint
 
 After a session has been created with SQUIZZ.com platform's API, if the same session is persistently being used over a long period time, then its worth validating that the session has not been destroyed by the API.
@@ -347,8 +458,9 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section842](https://w
 		}
 		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 		
-		$apiNamespace = "org\\squizz\\api\\v1";
-		$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/path/to/esd-php-library/src/";
 		
 		//set absolute path to API php class files
 		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -356,15 +468,15 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section842](https://w
 		}
 		//set absolute path to ESD library files
 		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-			$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+			$fileName = $esdInstallPath . $fileName;
 		}
 		
 		require $fileName;
 	});
 	
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-	use org\squizz\api\v1\APIv1OrgSession;
-	use org\squizz\api\v1\APIv1Constants;
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
 	
 	
 	//obtain or load in an organisation's API credentials, in this example from command line arguments
@@ -443,8 +555,9 @@ The SQUIZZ.com platform's API will automatically expire and destory sessions tha
 		}
 		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 		
-		$apiNamespace = "org\\squizz\\api\\v1";
-		$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/path/to/esd-php-library/src/";
 		
 		//set absolute path to API php class files
 		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -452,15 +565,15 @@ The SQUIZZ.com platform's API will automatically expire and destory sessions tha
 		}
 		//set absolute path to ESD library files
 		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-			$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+			$fileName = $esdInstallPath . $fileName;
 		}
 		
 		require $fileName;
 	});
 	
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-	use org\squizz\api\v1\APIv1OrgSession;
-	use org\squizz\api\v1\APIv1Constants;
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
 	
 	
 	//obtain or load in an organisation's API credentials, in this example from command line arguments
@@ -539,8 +652,9 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section841](https://w
 		}
 		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 		
-		$apiNamespace = "org\\squizz\\api\\v1";
-		$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/path/to/esd-php-library/src/";
 		
 		//set absolute path to API php class files
 		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -548,15 +662,15 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section841](https://w
 		}
 		//set absolute path to ESD library files
 		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-			$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+			$fileName = $esdInstallPath . $fileName;
 		}
 		
 		require $fileName;
 	});
 	
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-	use org\squizz\api\v1\APIv1OrgSession;
-	use org\squizz\api\v1\APIv1Constants;
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
 	
 	
 	//obtain or load in an organisation's API credentials, in this example from command line arguments

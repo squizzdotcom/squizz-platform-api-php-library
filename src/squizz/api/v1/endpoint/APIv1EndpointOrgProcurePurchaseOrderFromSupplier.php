@@ -6,17 +6,17 @@
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
 	*/
-	namespace org\squizz\api\v1\endpoint;
-	require_once __DIR__ . '/../../../../../../3rd-party/jsonmapper/JsonMapper.php';
+	namespace squizz\api\v1\endpoint;
+	require_once __DIR__ . '/../../../../../3rd-party/jsonmapper/JsonMapper.php';
 	
-	use org\squizz\api\v1\APIv1Constants;
-	use org\squizz\api\v1\APIv1HTTPRequest;
-	use org\squizz\api\v1\APIv1OrgSession;
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponseESD;
-	use org\esd\EcommerceStandardsDocuments\ESDocument;
-	use org\esd\EcommerceStandardsDocuments\ESDocumentConstants;
-	use org\esd\EcommerceStandardsDocuments\ESDocumentOrderPurchase;
-	use org\esd\EcommerceStandardsDocuments\ESDocumentOrderSale;
+	use squizz\api\v1\APIv1Constants;
+	use squizz\api\v1\APIv1HTTPRequest;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+	use EcommerceStandardsDocuments\ESDocument;
+	use EcommerceStandardsDocuments\ESDocumentConstants;
+	use EcommerceStandardsDocuments\ESDocumentOrderPurchase;
+	use EcommerceStandardsDocuments\ESDocumentOrderSale;
 	use \JsonMapper;
 
 	/**
@@ -74,7 +74,7 @@
 			{
 				$endpointResponse->result = APIv1EndpointResponse::ENDPOINT_RESULT_FAILURE;
 				$endpointResponse->result_code = APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_UNKNOWN;
-				$endpointResponse->result_message = $apiOrgSession->getLangBundle()->getString($endpointResponse->result_code) . "\n" . ex.getLocalizedMessage();
+				$endpointResponse->result_message = $apiOrgSession->getLangBundle()->getString($endpointResponse->result_code) . "\n" . ex.getMessage();
 			}
 			
 			return $endpointResponse;

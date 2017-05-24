@@ -5,12 +5,12 @@
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
 	*/
-	namespace org\squizz\api\v1;
-	use org\esd\EcommerceStandardsDocuments\ESDocumentConstants;
-	use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-	use org\squizz\api\v1\lang\APIv1LangBundle;
-	use org\squizz\api\v1\APIv1HTTPRequest;
-	use org\squizz\api\v1\APIv1Constants;
+	namespace squizz\api\v1;
+	use EcommerceStandardsDocuments\ESDocumentConstants;
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\lang\APIv1LangBundle;
+	use squizz\api\v1\APIv1HTTPRequest;
+	use squizz\api\v1\APIv1Constants;
 
 	/**
 	* Represents a session created within the API of the SQUIZZ.com platform for an organisation

@@ -7,8 +7,8 @@
 			<div>SQUIZZ Pty Ltd</div>
 			<div>Testing SQUIZZ.com API PHP Library: version 1</div>
 			<hr style="max-width: 607px"/>
-			<h1>Validate API Session Example</h1>
-			<p>Tests making a request to the SQUIZZ.com API to create a session for an organisation then makes a call to the API validate that the session still exists.</p>
+			<h1>Create Organisation Notification API Example</h1>
+			<p>Tests making a request to the SQUIZZ.com API to create a session for an organisation then makes a call to the API to create organisation notifications and send them to connected people who are set to receive the notifications for the category</p>
 			<div style="max-width: 607px; background-color: #2b2b2b; color: #cacaca; text-align: center; margin: auto; padding-top: 15px;">
 				<?php
 					/**
@@ -30,8 +30,9 @@
 						}
 						$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 						
-						$apiNamespace = "org\\squizz\\api\\v1";
-						$esdNamespace = "org\\esd\\EcommerceStandardsDocuments";
+						$apiNamespace = "squizz\\api\\v1";
+						$esdNamespace = "EcommerceStandardsDocuments";
+						$esdInstallPath = "/opt/squizz/esd-php-library/src/";
 						
 						//set absolute path to API php class files
 						if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -39,22 +40,25 @@
 						}
 						//set absolute path to ESD library files
 						else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
-							$fileName = '/opt/squizz/esd-php-library/src/' . $fileName;
+							$fileName = $esdInstallPath . $fileName;
 						}
 						
 						require $fileName;
 					});
 					
-					use org\squizz\api\v1\endpoint\APIv1EndpointResponse;
-					use org\squizz\api\v1\APIv1OrgSession;
-					use org\squizz\api\v1\APIv1Constants;
-					
+					use squizz\api\v1\endpoint\APIv1EndpointResponse;
+					use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+					use squizz\api\v1\endpoint\APIv1EndpointOrgCreateNotification;
+					use squizz\api\v1\APIv1OrgSession;
+					use squizz\api\v1\APIv1Constants;
+					use EcommerceStandardsDocuments\ESDocumentConstants;
 					
 					//obtain or load in an organisation's API credentials, in this example from command line arguments
 					$orgID = $_GET["orgID"];
 					$orgAPIKey = $_GET["orgAPIKey"];
 					$orgAPIPass = $_GET["orgAPIPass"];
-					$sessionTimeoutMilliseconds = 20000;
+					$supplierOrgID = $_GET["supplierOrgID"];
+					$sessionTimeoutMilliseconds = 60000;
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
 					
@@ -67,30 +71,44 @@
 					//check if the organisation's credentials were correct and that a session was created in the platform's API
 					$result = "FAIL";
 					$resultMessage = "";
-					if($endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
-					{
-					}
-					else
+					if(!$endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
 					{
 						//session failed to be created
 						$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 					}
 					
-					//validate the session in the platform's API
-					$endpointResponse = $apiOrgSession->validateOrgSession();
-					
-					//check the result of validating the session
-					if($endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
-						$result = "SUCCESS";
-						$resultMessage = "API session has successfully been validated.";
-					}else{
-						//session failed to be validated
-						$resultMessage = "API session failed to be validated. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
+					//sand and procure purchsae order if the API was successfully created
+					if($apiOrgSession->sessionExists())
+					{
+						//set the notification category that the organisation will display under in the platform, in this case the sales order category
+						$notifyCategory = APIv1EndpointOrgCreateNotification::NOTIFY_CATEGORY_ORDER_SALE;
+						
+						//after 20 seconds give up on waiting for a response from the API when creating the notification
+						$timeoutMilliseconds = 20000;
+						
+						//set the message that will appear in the notification, note the placeholders {1} and {2} that will be replaced with data values
+						$message = "A new {1} was created in {2} Website";
+						
+						//set labels and links to place within the placeholders of the message
+						$linkLabels = array("Sales Order","Acme Industries");
+						$linkURLs = array("","http://www.example.com/acmeindustries");
+						
+						//call the platform's API to create the organistion notification and have people assigned to organisation's notification category receive it
+						$endpointResponseESD = APIv1EndpointOrgCreateNotification::call($apiOrgSession, $timeoutMilliseconds, $notifyCategory, $message, $linkURLs, $linkLabels);
+						
+						//check the result of procuring the purchase orders
+						if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
+							$result = "SUCCESS";
+							$resultMessage = "Organisation notification successfully created in the platform.";
+						}else{
+							$result = "FAIL";
+							$resultMessage = "Organisation notification failed to be created. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code;
+						}
 					}
 					
 					//next steps
 					//call other API endpoints...
-					//destroy api session when done
+					//destroy API session when done...
 					$apiOrgSession->destroyOrgSession();
 					
 					echo "<div>Result:<div>";
