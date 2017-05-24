@@ -15,7 +15,7 @@
 		/**
 		* HTTP protocol to use when calling the platform's API
 		*/
-		const API_PROTOCOL = "http://";
+		const API_PROTOCOL = "https://";
 		
 		/**
 		* internet domain to use when calling the platform's API
