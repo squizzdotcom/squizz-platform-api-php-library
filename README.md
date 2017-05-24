@@ -140,7 +140,6 @@ See the example below on how the call the Send and Procure Purchase order From S
 ```php
 <?php
 	//set automatic loader of the library's classes
-	require_once __DIR__ . '/../../../../../../3rd-party/jsonmapper/JsonMapper.php';
 	spl_autoload_register(function($className) {
 		$className = ltrim($className, '\\');
 		$fileName  = '';
