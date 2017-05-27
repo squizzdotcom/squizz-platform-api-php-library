@@ -122,6 +122,223 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section840](https://w
 ?>
 ```
 
+## Retrieve Organisation Data Endpoint
+The SQUIZZ.com platform's API has an endpoint that allows a variety of different types of data to be retrieved from another organisation stored on the platform.
+The organisational data that can be retrieved includes products, product stock quantities, and product pricing.
+The data retrieved can be used to allow an organisation to set additional information about products being bought or sold, as well as being used in many other ways.
+Each kind of data retrieved from endpoint is formatted as JSON data conforming to the "Ecommerce Standards Document" standards, with each document containing an array of zero or more records. Use the Ecommerce Standards library to easily read through these documents and records, to find data natively using PHP classes.
+Read [https://www.squizz.com/docs/squizz/Platform-API.html#section969](https://www.squizz.com/docs/squizz/Platform-API.html#section969) for more documentation about the endpoint and its requirements.
+See the example below on how the call the Retrieve Organisation ESD Data endpoint. Note that a session must first be created in the API before calling the endpoint.
+
+```php
+<?php
+	//set automatic loader of the library's classes
+	spl_autoload_register(function($className) {
+		$className = ltrim($className, '\\');
+		$fileName  = '';
+		$namespace = '';
+		if ($lastNsPos = strripos($className, '\\')) {
+			$namespace = substr($className, 0, $lastNsPos);
+			$className = substr($className, $lastNsPos + 1);
+			$fileName  = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+		}
+		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/opt/squizz/esd-php-library/src/";
+		
+		//set absolute path to API php class files
+		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
+			$fileName = $_SERVER['DOCUMENT_ROOT']. '/src/' . $fileName;
+		}
+		//set absolute path to ESD library files
+		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
+			$fileName = $esdInstallPath . $fileName;
+		}
+		
+		require $fileName;
+	});
+
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+	use squizz\api\v1\endpoint\APIv1EndpointOrgRetrieveESDocument;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
+	use EcommerceStandardsDocuments\ESDRecordOrderPurchase;
+	use EcommerceStandardsDocuments\ESDRecordOrderPurchaseLine;
+	use EcommerceStandardsDocuments\ESDocumentConstants;
+	use EcommerceStandardsDocuments\ESDocumentProduct;
+
+	//obtain or load in an organisation's API credentials, in this example from command line arguments
+	$orgID = $_GET["orgID"];
+	$orgAPIKey = $_GET["orgAPIKey"];
+	$orgAPIPass = $_GET["orgAPIPass"];
+	$supplierOrgID = $_GET["supplierOrgID"];
+	$retrieveTypeID = APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRICING;
+	$sessionTimeoutMilliseconds = 60000;
+
+	echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
+
+	//create an API session instance
+	$apiOrgSession = new APIv1OrgSession($orgID, $orgAPIKey, $orgAPIPass, $sessionTimeoutMilliseconds, APIv1Constants::SUPPORTED_LOCALES_EN_AU);
+
+	//call the platform's API to request that a session is created
+	$endpointResponse = $apiOrgSession->createOrgSession();
+
+	//check if the organisation's credentials were correct and that a session was created in the platform's API
+	$result = "FAIL";
+	$resultMessage = "";
+	if($endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
+	{
+	}
+	else
+	{
+		//session failed to be created
+		$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
+	}
+
+	//sand and procure purchsae order if the API was successfully created
+	if($apiOrgSession->sessionExists())
+	{
+		//after 120 seconds give up on waiting for a response from the API
+		$timeoutMilliseconds = 120000;
+		
+		//call the platform's API to import in the organisation's data, which for this example is product pricing
+		$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, $retrieveTypeID, $supplierOrgID, "");
+		
+		$esDocument = $endpointResponseESD->esDocument;
+
+		//check that the data successfully imported
+		if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
+			
+			$result = "SUCCESS";
+			$resultMessage = "Organisation data successfully obtained from the platform.<br/>Price records returned:".$esDocument->totalDataRecords;
+			
+			switch($retrieveTypeID){
+				case APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCTS:
+					
+					//check that records have been placed into the standards document
+					if($esDocument->dataRecords != null){
+						$resultMessage = $resultMessage."<br/>Product Records:".
+							'<table style="width: 100%;">'.
+								"<tr>".
+									"<th>#</th>".
+									"<th>Key Product ID</th>".
+									"<th>Product Code</th>".
+									"<th>Barcode</th>".
+									"<th>Name</th>".
+									"<th>Key Taxcode ID</th>".
+									"<th>Stock Available</th>".
+								"</tr>";
+						
+						//iterate through each product record stored within the standards document
+						$recordNumber=1;
+						
+						foreach ($esDocument->dataRecords as $productRecord)
+						{    
+							//output details of the price record
+							$resultMessage = $resultMessage."<tr>".
+								"<td>".$recordNumber."</td>".
+								"<td>".$productRecord->keyProductID."</td>".
+								"<td>".$productRecord->productCode."</td>".
+								"<td>".$productRecord->barcode."</td>".
+								"<td>".$productRecord->name."</td>".
+								"<td>".$productRecord->keyTaxcodeID."</td>".
+								"<td>".$productRecord->stockQuantity."</td>".
+							"</tr>";
+							
+							$recordNumber++;
+						}
+					}
+					
+					break;
+				case APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRICING:
+					//check that records have been placed into the standards document
+					if($esDocument->dataRecords != null){
+						$resultMessage = $resultMessage."<br/>Price Records:".
+							'<table style="width: 100%;">'.
+								"<tr>".
+									"<th>#</th>".
+									"<th>Key Product ID</th>".
+									"<th>Key Sell Unit ID</th>".
+									"<th>Quantity</th>".
+									"<th>Tax Rate</th>".
+									"<th>Price</th>".
+								"</tr>";
+						
+						//iterate through each price record stored within the standards document
+						$recordNumber=1;
+						
+						foreach ($esDocument->dataRecords as $priceRecord)
+						{    
+							//output details of the price record
+							$resultMessage = $resultMessage."<tr>".
+								"<td>".$recordNumber."</td>".
+								"<td>".$priceRecord->keyProductID."</td>".
+								"<td>".$priceRecord->keySellUnitID."</td>".
+								"<td>".$priceRecord->quantity."</td>".
+								"<td>".$priceRecord->taxRate."</td>".
+								"<td>".money_format ('%.2n', $priceRecord->price)."</td>".
+							"</tr>";
+							
+							$recordNumber++;
+						}
+					}
+					
+					break;
+				case APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCT_STOCK:
+					//check that records have been placed into the standards document
+					if($esDocument->dataRecords != null){
+						$resultMessage = $resultMessage."<br/>Price Records:".
+							'<table style="width: 100%;">'.
+								"<tr>".
+									"<th>#</th>".
+									"<th>Key Product ID</th>".
+									"<th>Quantity</th>".
+								"</tr>";
+						
+						//iterate through each stock record stored within the standards document
+						$recordNumber=1;
+						
+						foreach ($esDocument->dataRecords as $stockRecord)
+						{    
+							//output details of the price record
+							$resultMessage = $resultMessage."<tr>".
+								"<td>".$recordNumber."</td>".
+								"<td>".$stockRecord->keyProductID."</td>".
+								"<td>".$stockRecord->qtyAvailable."</td>".
+							"</tr>";
+							
+							$recordNumber++;
+						}
+					}
+					
+					break;
+				default:
+					$callEndpoint = false;
+					$endpointResponse->result = APIv1EndpointResponse::ENDPOINT_RESULT_FAILURE;
+					$endpointResponse->result_code = APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_INCORRECT_DATA_TYPE;
+					break;
+			}
+		}else{
+			$result = "FAIL";
+			$resultMessage = "Organisation data failed to be obtained from the platform. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
+		}
+	}
+
+	//next steps
+	//call other API endpoints...
+	//destroy API session when done...
+	$apiOrgSession->destroyOrgSession();
+
+	echo "<div>Result:<div>";
+	echo "<div><b>$result</b><div><br/>";
+	echo "<div>Message:<div>";
+	echo "<div><b>$resultMessage</b><div><br/>";
+?>
+```
+
 ### Send and Procure Purchase Order From Supplier Endpoint
 
 The SQUIZZ.com platform's API has an endpoint that allows an orgnisation to import a purchase order. and have it procured/converted into a sales order of a designated supplier organisation. 
