@@ -676,6 +676,145 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section854](https://w
 ?>
 ```
 
+## Import Organisation Data Endpoint
+The SQUIZZ.com platform's API has an endpoint that allows a wide variety of different types of data to be imported into the platform against an organisation. 
+This organisational data includes taxcodes, products, customer accounts, supplier accounts. pricing, price levels, locations, and many other kinds of data.
+This data is used to allow the organisation to buy and sell products, as well manage customers, suppliers, employees, and other people.
+Each type of data needs to be imported as an "Ecommerce Standards Document" that contains one or more records. Use the Ecommerce Standards library to easily create these documents and records.
+When importing one type of organisational data, it is important to import the full data set, otherwise the platform will deactivate unimported data.
+For example if 3 products are imported, then another products import is run that only imports 2 records, then other 1 product will become deactivated and no longer be able to be sold.
+Read [https://www.squizz.com/docs/squizz/Platform-API.html#section843](https://www.squizz.com/docs/squizz/Platform-API.html#section843) for more documentation about the endpoint and its requirements.
+See the example below on how the call the Import Organisation ESD Data endpoint. Note that a session must first be created in the API before calling the endpoint.
+
+```php
+<?php
+	//set automatic loader of the library's classes
+	spl_autoload_register(function($className) {
+		$className = ltrim($className, '\\');
+		$fileName  = '';
+		$namespace = '';
+		if ($lastNsPos = strripos($className, '\\')) {
+			$namespace = substr($className, 0, $lastNsPos);
+			$className = substr($className, $lastNsPos + 1);
+			$fileName  = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+		}
+		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/opt/squizz/esd-php-library/src/";
+		
+		//set absolute path to API php class files
+		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
+			$fileName = $_SERVER['DOCUMENT_ROOT']. '/src/' . $fileName;
+		}
+		//set absolute path to ESD library files
+		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
+			$fileName = $esdInstallPath . $fileName;
+		}
+		
+		require $fileName;
+	});
+
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+	use squizz\api\v1\endpoint\APIv1EndpointOrgImportESDocument;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
+	use EcommerceStandardsDocuments\ESDocumentTaxcode;
+	use EcommerceStandardsDocuments\ESDRecordTaxcode;
+	use EcommerceStandardsDocuments\ESDocumentConstants;
+
+	//obtain or load in an organisation's API credentials, in this example from command line arguments
+	$orgID = $_GET["orgID"];
+	$orgAPIKey = $_GET["orgAPIKey"];
+	$orgAPIPass = $_GET["orgAPIPass"];
+	$sessionTimeoutMilliseconds = 60000;
+
+	echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
+
+	//create an API session instance
+	$apiOrgSession = new APIv1OrgSession($orgID, $orgAPIKey, $orgAPIPass, $sessionTimeoutMilliseconds, APIv1Constants::SUPPORTED_LOCALES_EN_AU);
+
+	//call the platform's API to request that a session is created
+	$endpointResponse = $apiOrgSession->createOrgSession();
+
+	//check if the organisation's credentials were correct and that a session was created in the platform's API
+	$result = "FAIL";
+	$resultMessage = "";
+	if($endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
+	{
+	}
+	else
+	{
+		//session failed to be created
+		$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
+	}
+
+	//sand and procure purchsae order if the API was successfully created
+	if($apiOrgSession->sessionExists())
+	{
+		//create taxcode records
+		$taxcodeRecords = array();
+		$taxcodeRecord = new ESDRecordTaxcode();
+		$taxcodeRecord->keyTaxcodeID = "1";
+		$taxcodeRecord->taxcode = "GST";
+		$taxcodeRecord->taxcodeLabel = "GST";
+		$taxcodeRecord->description = "Goods And Services Tax";
+		$taxcodeRecord->taxcodePercentageRate = 10;
+		array_push($taxcodeRecords, $taxcodeRecord);
+		
+		$taxcodeRecord = new ESDRecordTaxcode();
+		$taxcodeRecord->keyTaxcodeID = "2";
+		$taxcodeRecord->taxcode = "FREE";
+		$taxcodeRecord->taxcodeLabel = "Tax Free";
+		$taxcodeRecord->description = "Free from Any Taxes";
+		$taxcodeRecord->taxcodePercentageRate = 0;
+		array_push($taxcodeRecords, $taxcodeRecord);
+		
+		$taxcodeRecord = new ESDRecordTaxcode();
+		$taxcodeRecord->keyTaxcodeID = "3";
+		$taxcodeRecord->taxcode = "NZGST";
+		$taxcodeRecord->taxcodeLabel = "New Zealand GST Tax";
+		$taxcodeRecord->description = "New Zealand Goods and Services Tax";
+		$taxcodeRecord->taxcodePercentageRate = 15;
+		array_push($taxcodeRecords, $taxcodeRecord);
+		
+		//after 60 seconds give up on waiting for a response from the API when importing the organisation data
+		$timeoutMilliseconds = 60000;
+		
+		//add a dataFields attribute that contains a comma delimited list of taxcode record fields that the API is allowed to insert or update in the platform
+		$configs = array();
+		$configs['dataFields'] = 'keyTaxcodeID,taxcode,taxcodeLabel,description,taxcodePercentageRate';
+		
+		//create taxcode Ecommerce Standards document and add taxcode records to the document
+		$taxcodeESD = new ESDocumentTaxcode(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $taxcodeRecords, $configs);
+
+		//send the taxcode document to the API to be imported against the organisation logged into the API
+		$endpointResponseESD = APIv1EndpointOrgImportESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgImportESDocument::IMPORT_TYPE_ID_TAXCODES, $taxcodeESD);
+		
+		//check the result of procuring the purchase orders
+		if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
+			$result = "SUCCESS";
+			$resultMessage = "Organisation data successfully imported into the platform.";
+		}else{
+			$result = "FAIL";
+			$resultMessage = "Organisation data failed to be imported into the platform. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
+		}
+	}
+
+	//next steps
+	//call other API endpoints...
+	//destroy API session when done...
+	$apiOrgSession->destroyOrgSession();
+
+	echo "<div>Result:<div>";
+	echo "<div><b>$result</b><div><br/>";
+	echo "<div>Message:<div>";
+	echo "<div><b>$resultMessage</b><div><br/>";
+?>
+```
+
 ### Validate Organisation API Session Endpoint
 
 After a session has been created with SQUIZZ.com platform's API, if the same session is persistently being used over a long period time, then its worth validating that the session has not been destroyed by the API.

@@ -90,10 +90,9 @@
 						//create purchase order record to import
 						$purchaseOrderRecord = new ESDRecordOrderPurchase();
 						
-						//set data within the purchase order
+						//set data within the purchase order (each of these 6 fields are optional)
 						$purchaseOrderRecord->keyPurchaseOrderID = "111";
 						$purchaseOrderRecord->purchaseOrderCode = "POEXAMPLE-345";
-						$purchaseOrderRecord->purchaseOrderNumber = "345";
 						$purchaseOrderRecord->purchaseOrderNumber = "345";
 						$purchaseOrderRecord->instructions = "Leave goods at the back entrance";
 						$purchaseOrderRecord->keySupplierAccountID = "2";
@@ -125,13 +124,18 @@
 						//create purchase order line record
 						$orderProduct = new ESDRecordOrderPurchaseLine();
 						$orderProduct->lineType = ESDocumentConstants::ORDER_LINE_TYPE_PRODUCT;
+						//set mandatory data in line fields
 						$orderProduct->productCode = "TEA-TOWEL-GREEN";
+						$orderProduct->quantity = 4;
+						
+						//set the supplier's product code in this field if the supplier's product code is different from the customer org's product code
+						$orderProduct->salesOrderLineCode = "ACME-TTGREEN"; 
+						
+						//set optional data in line fields
 						$orderProduct->productName = "Green tea towel - 30 x 6 centimetres";
 						$orderProduct->keySellUnitID = "2";
 						$orderProduct->unitName = "EACH";
-						$orderProduct->quantity = 4;
 						$orderProduct->sellUnitBaseQuantity = 4;
-						$orderProduct->salesOrderLineCode = "ACME-TTGREEN"; 
 						$orderProduct->priceExTax = 5.00;
 						$orderProduct->priceIncTax = 5.50;
 						$orderProduct->priceTax = 0.50;
@@ -149,15 +153,14 @@
 						$purchaseOrderRecords = array();
 						array_push($purchaseOrderRecords, $purchaseOrderRecord);
 						
-						//after 60 seconds give up on waiting for a response from the API when creating the notification
+						//after 60 seconds give up on waiting for a response from the API when procuring the order
 						$timeoutMilliseconds = 60000;
 						
-						//create purchase order Ecommerce Standards document and add purchse order records to the document
+						//create purchase order Ecommerce Standards document and add purchase order records to the document
 						$orderPurchaseESD = new ESDocumentOrderPurchase(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $purchaseOrderRecords, array());
 
 						//send purchase order document to the API for procurement by the supplier organisation
 						$endpointResponseESD = APIv1EndpointOrgProcurePurchaseOrderFromSupplier::call($apiOrgSession, $timeoutMilliseconds, $supplierOrgID, "", $orderPurchaseESD);
-						//$esDocumentOrderSale = (ESDocumentOrderSale) $endpointResponseESD->esDocument;
 						$esDocumentOrderSale = $endpointResponseESD->esDocument;
 						
 						//check the result of procuring the purchase orders
