@@ -32,7 +32,7 @@
 						
 						$apiNamespace = "squizz\\api\\v1";
 						$esdNamespace = "EcommerceStandardsDocuments";
-						$esdInstallPath = "/opt/squizz/esd-php-library/src/";
+						$esdInstallPath = "/path/to/esd-php-library/src/";
 						
 						//set absolute path to API php class files
 						if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -81,7 +81,7 @@
 						$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 					}
 					
-					//sand and procure purchsae order if the API was successfully created
+					//import organisation data if the API session was successfully created
 					if($apiOrgSession->sessionExists())
 					{
 						//create taxcode records
@@ -123,7 +123,7 @@
 						//send the taxcode document to the API to be imported against the organisation logged into the API
 						$endpointResponseESD = APIv1EndpointOrgImportESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgImportESDocument::IMPORT_TYPE_ID_TAXCODES, $taxcodeESD);
 						
-						//check the result of procuring the purchase orders
+						//check the result of importing the organisation data
 						if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
 							$result = "SUCCESS";
 							$resultMessage = "Organisation data successfully imported into the platform.";

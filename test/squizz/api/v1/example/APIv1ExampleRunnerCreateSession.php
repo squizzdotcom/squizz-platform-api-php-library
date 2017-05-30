@@ -33,7 +33,7 @@
 						
 						$apiNamespace = "squizz\\api\\v1";
 						$esdNamespace = "EcommerceStandardsDocuments";
-						$esdInstallPath = "/opt/squizz/esd-php-library/src/";
+						$esdInstallPath = "/path/to/esd-php-library/src/";
 						
 						//set absolute path to API php class files
 						if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
