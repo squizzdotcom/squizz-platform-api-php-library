@@ -104,7 +104,7 @@
 			{
 				$endpointResponse->result = APIv1EndpointResponse::ENDPOINT_RESULT_FAILURE;
 				$endpointResponse->result_code = APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_UNKNOWN;
-				$endpointResponse->result_message = $apiOrgSession->getLangBundle()->getString($endpointResponse->result_code) . "\n" . ex.getMessage();
+				$endpointResponse->result_message = $apiOrgSession->getLangBundle()->getString($endpointResponse->result_code) . "\n" . $ex.getMessage();
 			}
 			
 			return $endpointResponse;

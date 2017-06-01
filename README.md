@@ -29,7 +29,8 @@ If you are a software developer writing a PHP application then we recommend that
     * [Validate Organisation API Session Endpoint](#validate-organisation-api-session-endpoint)
     * [Validate/Create Organisation API Session Endpoint](#validatecreate-organisation-api-session-endpoint)
     * [Destroy Organisation API Session Endpoint](#destroy-organisation-api-session-endpoint)
-
+    * [Validate Organisation Security Certificate API Session Endpoint](#validate-organisation-security-certificate-api-session-endpoint)
+    
 ## Getting Started
 
 ### Dependencies
@@ -124,7 +125,7 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section840](https://w
 ?>
 ```
 
-## Retrieve Organisation Data Endpoint
+### Retrieve Organisation Data Endpoint
 The SQUIZZ.com platform's API has an endpoint that allows a variety of different types of data to be retrieved from another organisation stored on the platform.
 The organisational data that can be retrieved includes products, product stock quantities, and product pricing.
 The data retrieved can be used to allow an organisation to set additional information about products being bought or sold, as well as being used in many other ways.
@@ -915,13 +916,6 @@ The SQUIZZ.com platform's API will automatically expire and destory sessions tha
 
 ```php
 <?php
-	/**
-	* Copyright (C) 2017 Squizz PTY LTD
-	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
-	*/
-	
 	//set automatic loader of the library's classes
 	spl_autoload_register(function($className) {
 		$className = ltrim($className, '\\');
@@ -1012,13 +1006,6 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section841](https://w
 
 ```php
 <?php
-	/**
-	* Copyright (C) 2017 Squizz PTY LTD
-	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
-	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
-	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
-	*/
-	
 	//set automatic loader of the library's classes
 	spl_autoload_register(function($className) {
 		$className = ltrim($className, '\\');
@@ -1092,6 +1079,108 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section841](https://w
 		//session failed to be created
 		$resultMessage = "API session failed to be destroyed. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 	}
+	
+	echo "<div>Result:<div>";
+	echo "<div><b>$result</b><div><br/>";
+	echo "<div>Message:<div>";
+	echo "<div><b>$resultMessage</b><div><br/>";
+?>
+```
+
+### Validate Organisation Security Certificate API Session Endpoint
+
+The SQUIZZ.com platform's API has an endpoint that allows a TLS security certificate created for an organisation in the platform to be validated. 
+Before an organisation can download and use a security certificate the certificate must first be validated by a HTTP request calling this API endpoint. 
+The endpoint will check that the originating HTTP request's IP address matches the common name set for the certificate, or that a reverse DNS lookup matches the domain set in the certificate with the originating IP address of the endpoint request.
+Read [https://www.squizz.com/docs/squizz/Platform-API.html#section842](https://www.squizz.com/docs/squizz/Platform-API.html#section843) for more documentation about the endpoint and its requirements.
+See the example below on how the call the Validate Organisation Security Certificate endpoint. Note that a session must first be created in the API before calling the endpoint.
+
+```php
+<?php
+	//set automatic loader of the library's classes
+	spl_autoload_register(function($className) {
+		$className = ltrim($className, '\\');
+		$fileName  = '';
+		$namespace = '';
+		if ($lastNsPos = strripos($className, '\\')) {
+			$namespace = substr($className, 0, $lastNsPos);
+			$className = substr($className, $lastNsPos + 1);
+			$fileName  = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+		}
+		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/path/to/esd-php-library/src/";
+		
+		//set absolute path to API php class files
+		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
+			$fileName = $_SERVER['DOCUMENT_ROOT']. '/src/' . $fileName;
+		}
+		//set absolute path to ESD library files
+		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
+			$fileName = $esdInstallPath . $fileName;
+		}
+		
+		require $fileName;
+	});
+	
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\endpoint\APIv1EndpointOrgValidateSecurityCertificate;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
+	
+	
+	//obtain or load in an organisation's API credentials, in this example from command line arguments
+	$orgID = $_GET["orgID"];
+	$orgAPIKey = $_GET["orgAPIKey"];
+	$orgAPIPass = $_GET["orgAPIPass"];
+	$orgSecurityCertificateID = $_GET["orgSecurityCertificateID"];
+	$sessionTimeoutMilliseconds = 20000;
+	
+	echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
+	
+	//create an API session instance
+	$apiOrgSession = new APIv1OrgSession($orgID, $orgAPIKey, $orgAPIPass, $sessionTimeoutMilliseconds, APIv1Constants::SUPPORTED_LOCALES_EN_AU);
+	
+	//call the platform's API to request that a session is created
+	$endpointResponse = $apiOrgSession->createOrgSession();
+	
+	//check if the organisation's credentials were correct and that a session was created in the platform's API
+	$result = "FAIL";
+	$resultMessage = "";
+	if($endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
+	{
+	}
+	else
+	{
+		//session failed to be created
+		$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
+	}
+	
+	//if a session was successfully created then call API to validate a certificate with a given ID
+	if($apiOrgSession->sessionExists())
+	{
+		//give up on waiting for a response from the API after 30 seconds
+		$timeoutMilliseconds = 30000;
+	
+		//call endpoint
+		$endpointResponseESD = APIv1EndpointOrgValidateSecurityCertificate::call($apiOrgSession, $timeoutMilliseconds, $orgSecurityCertificateID);
+		
+		//check the result of validating the security certificate
+		if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
+			$result = "SUCCESS";
+			$resultMessage = "Organisation security certificate has successfully been validated and activated.";
+		}else{
+			$result = "FAIL";
+			$resultMessage = "Organisation security certificate failed to validate. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
+		}
+	}
+	
+	//next steps
+	//call other API endpoints...
+	//destroy api session when done
+	$apiOrgSession->destroyOrgSession();
 	
 	echo "<div>Result:<div>";
 	echo "<div><b>$result</b><div><br/>";
