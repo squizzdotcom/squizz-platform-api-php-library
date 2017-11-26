@@ -73,7 +73,7 @@
 					$orgAPIKey = $_GET["orgAPIKey"];
 					$orgAPIPass = $_GET["orgAPIPass"];
 					$supplierOrgID = $_GET["supplierOrgID"];
-					$retrieveTypeID = APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRICING;
+					$retrieveTypeID = $_GET["retrieveTypeID"];
 					$sessionTimeoutMilliseconds = 60000;
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
@@ -96,7 +96,7 @@
 						$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 					}
 					
-					//sand and procure purchsae order if the API was successfully created
+					//retrieve organisation data if the API was successfully created
 					if($apiOrgSession->sessionExists())
 					{
 						//after 120 seconds give up on waiting for a response from the API
@@ -193,7 +193,8 @@
 												"<tr>".
 													"<th>#</th>".
 													"<th>Key Product ID</th>".
-													"<th>Quantity</th>".
+													"<th>Quantity Available</th>".
+													"<th>Quantity Orderable</th>".
 												"</tr>";
 										
 										//iterate through each stock record stored within the standards document
@@ -206,6 +207,7 @@
 												"<td>".$recordNumber."</td>".
 												"<td>".$stockRecord->keyProductID."</td>".
 												"<td>".$stockRecord->qtyAvailable."</td>".
+												"<td>".$stockRecord->qtyOrderable."</td>".
 											"</tr>";
 											
 											$recordNumber++;

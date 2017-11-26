@@ -62,6 +62,7 @@
 					$orgAPIKey = $_GET["orgAPIKey"];
 					$orgAPIPass = $_GET["orgAPIPass"];
 					$supplierOrgID = $_GET["supplierOrgID"];
+					$customerAccountCode = $_GET["customerAccountCode"];
 					$sessionTimeoutMilliseconds = 60000;
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
@@ -84,7 +85,7 @@
 						$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 					}
 					
-					//sand and procure purchsae order if the API was successfully created
+					//send and procure purchase order if the API was successfully created
 					if($apiOrgSession->sessionExists())
 					{
 						//create purchase order record to import
@@ -129,7 +130,7 @@
 						$orderProduct->quantity = 4;
 						
 						//set the supplier's product code in this field if the supplier's product code is different from the customer org's product code
-						$orderProduct->salesOrderLineCode = "ACME-TTGREEN"; 
+						$orderProduct->salesOrderProductCode = "TEA-TOWEL-GREEN";
 						
 						//set optional data in line fields
 						$orderProduct->productName = "Green tea towel - 30 x 6 centimetres";
@@ -146,6 +147,21 @@
 						//add order line to lines list
 						array_push($orderLines, $orderProduct);
 						
+						//add a 2nd purchase order line record that is a text line
+						$orderProduct = new ESDRecordOrderPurchaseLine();
+						$orderProduct->lineType = ESDocumentConstants::ORDER_LINE_TYPE_TEXT;
+						$orderProduct->textDescription = "Please bundle tea towels into a box";
+						array_push($orderLines, $orderProduct);
+						
+						//add a 3rd purhase order line record
+						$orderProduct = new ESDRecordOrderPurchaseLine();
+						$orderProduct->lineType = ESDocumentConstants::ORDER_LINE_TYPE_PRODUCT;
+						$orderProduct->productCode = "TEA-TOWEL-BLUE";
+						$orderProduct->productName = "Blue tea towel - 30 x 6 centimetres";
+						$orderProduct->quantity = 2;
+						$orderProduct->salesOrderProductCode = "ACME-TTBLUE";
+						array_push($orderLines, $orderProduct);
+						
 						//add order lines to the order
 						$purchaseOrderRecord->lines = $orderLines;
 					
@@ -160,7 +176,7 @@
 						$orderPurchaseESD = new ESDocumentOrderPurchase(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $purchaseOrderRecords, array());
 
 						//send purchase order document to the API for procurement by the supplier organisation
-						$endpointResponseESD = APIv1EndpointOrgProcurePurchaseOrderFromSupplier::call($apiOrgSession, $timeoutMilliseconds, $supplierOrgID, "", $orderPurchaseESD);
+						$endpointResponseESD = APIv1EndpointOrgProcurePurchaseOrderFromSupplier::call($apiOrgSession, $timeoutMilliseconds, $supplierOrgID, $customerAccountCode, $orderPurchaseESD);
 						$esDocumentOrderSale = $endpointResponseESD->esDocument;
 						
 						//check the result of procuring the purchase orders
