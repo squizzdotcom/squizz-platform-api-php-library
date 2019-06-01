@@ -1693,10 +1693,17 @@ The SQUIZZ.com platform's API has an endpoint that allows a wide variety of diff
 This organisational data includes taxcodes, products, customer accounts, supplier accounts. pricing, price levels, locations, and many other kinds of data.
 This data is used to allow the organisation to buy and sell products, as well manage customers, suppliers, employees, and other people.
 Each type of data needs to be imported as an "Ecommerce Standards Document" that contains one or more records. Use the Ecommerce Standards library to easily create these documents and records.
-When importing one type of organisational data, it is important to import the full data set, otherwise the platform will deactivate unimported data.
+When importing one type of organisational data, it is important to import the full data set, otherwise the platform will deactivate non-imported data.
 For example if 3 products are imported, then another products import is run that only imports 2 records, then other 1 product will become deactivated and no longer be able to be sold.
-Read [https://www.squizz.com/docs/squizz/Platform-API.html#section843](https://www.squizz.com/docs/squizz/Platform-API.html#section843) for more documentation about the endpoint and its requirements.
+Read [https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Import-Organisation-Data.html](https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Import-Organisation-Data.html) for more documentation about the endpoint and its requirements.
 See the example below on how the call the Import Organisation ESD Data endpoint. Note that a session must first be created in the API before calling the endpoint.
+Other examples exist in this repository's examples folder on how to import serveral different types of data:
+ - Import Taxcodes [APIv1ExampleRunnerImportOrgESDDataTaxcodes.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataTaxcodes.php)
+ - Import Categories [APIv1ExampleRunnerImportOrgESDDataCategories.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataCategories.php)
+ - Import Attributes [APIv1ExampleRunnerImportOrgESDDataAttributes.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataAttributes.php)
+ - Import Makers [APIv1ExampleRunnerImportOrgESDDataMakers.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataMakers.php)
+ - Import Maker Models [APIv1ExampleRunnerImportOrgESDDataMakerModels.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataMakerModels.php)
+ - Import Maker Model Mappings [APIv1ExampleRunnerImportOrgESDDataMakerModelMappings.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataMakerModelMappings.php)
 
 ```php
 <?php

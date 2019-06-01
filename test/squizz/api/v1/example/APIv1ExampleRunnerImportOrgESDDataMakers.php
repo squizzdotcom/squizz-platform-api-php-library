@@ -7,7 +7,7 @@
 			<div>SQUIZZ Pty Ltd</div>
 			<div>Testing SQUIZZ.com API PHP Library: version 1</div>
 			<hr style="max-width: 607px"/>
-			<h1>Import Organisation Data API Example</h1>
+			<h1>Import Maker Organisation Data API Example</h1>
 			<p>Tests making a request to the SQUIZZ.com API to create a session for an organisation then makes a call to the API to import data of an organisation into the SQUIZZ.com platform</p>
 			<div style="max-width: 607px; background-color: #2b2b2b; color: #cacaca; text-align: center; margin: auto; padding-top: 15px;">
 				<?php
@@ -51,8 +51,8 @@
 					use squizz\api\v1\endpoint\APIv1EndpointOrgImportESDocument;
 					use squizz\api\v1\APIv1OrgSession;
 					use squizz\api\v1\APIv1Constants;
-					use EcommerceStandardsDocuments\ESDocumentTaxcode;
-					use EcommerceStandardsDocuments\ESDRecordTaxcode;
+					use EcommerceStandardsDocuments\ESDocumentMaker;
+					use EcommerceStandardsDocuments\ESDRecordMaker;
 					use EcommerceStandardsDocuments\ESDocumentConstants;
 					
 					//obtain or load in an organisation's API credentials, in this example from command line arguments
@@ -81,47 +81,82 @@
 						$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 					}
 					
-					//import organisation data if the API session was successfully created
+					//import organisation maker data if the API session was successfully created
 					if($apiOrgSession->sessionExists())
 					{
-						//create taxcode records
-						$taxcodeRecords = array();
-						$taxcodeRecord = new ESDRecordTaxcode();
-						$taxcodeRecord->keyTaxcodeID = "1";
-						$taxcodeRecord->taxcode = "GST";
-						$taxcodeRecord->taxcodeLabel = "GST";
-						$taxcodeRecord->description = "Goods And Services Tax";
-						$taxcodeRecord->taxcodePercentageRate = 10;
-						array_push($taxcodeRecords, $taxcodeRecord);
+						//create maker records
+						$makerRecords = array();
+						$makerRecord = new ESDRecordMaker();
+						$makerRecord->keyMakerID = "1";
+						$makerRecord->makerCode = "CAR1";
+						$makerRecord->name = "Car Manufacturer X";
+						$makerRecord->makerSearchCode = "Car-Manufacturer-X-Sedans-Wagons-Trucks";
+						$makerRecord->groupClass = "POPULAR CARS";
+						$makerRecord->ordering = 3;
+						$makerRecord->establishedDate = 1449132083087;
+						$makerRecord->orgName = "Car Manufacturer X";
+						$makerRecord->authorityNumbers = array();
+						$makerRecord->authorityNumberLabels = array();
+						$makerRecord->authorityNumberTypes = array();
+						array_push($makerRecord->authorityNumbers, "988776643221");
+						array_push($makerRecord->authorityNumberLabels, "Australian Business Number");
+						array_push($makerRecord->authorityNumberTypes, 1);
 						
-						$taxcodeRecord = new ESDRecordTaxcode();
-						$taxcodeRecord->keyTaxcodeID = "2";
-						$taxcodeRecord->taxcode = "FREE";
-						$taxcodeRecord->taxcodeLabel = "Tax Free";
-						$taxcodeRecord->description = "Free from Any Taxes";
-						$taxcodeRecord->taxcodePercentageRate = 0;
-						array_push($taxcodeRecords, $taxcodeRecord);
+						array_push($makerRecords, $makerRecord);
 						
-						$taxcodeRecord = new ESDRecordTaxcode();
-						$taxcodeRecord->keyTaxcodeID = "3";
-						$taxcodeRecord->taxcode = "NZGST";
-						$taxcodeRecord->taxcodeLabel = "New Zealand GST Tax";
-						$taxcodeRecord->description = "New Zealand Goods and Services Tax";
-						$taxcodeRecord->taxcodePercentageRate = 15;
-						array_push($taxcodeRecords, $taxcodeRecord);
+						//add 2nd maker record
+						$makerRecord = new ESDRecordMaker();
+						$makerRecord->keyMakerID = "2";
+						$makerRecord->makerCode = "CAR2";
+						$makerRecord->name = "Car Manufacturer A";
+						$makerRecord->makerSearchCode = "Car-Manufacturer-A";
+						$makerRecord->groupClass = "POPULAR CARS";
+						$makerRecord->ordering = 2;
+						$makerRecord->establishedDate = 1449132083084;
+						$makerRecord->orgName = "Car Manufacturer A";
+						$makerRecord->authorityNumbers = array();
+						$makerRecord->authorityNumberLabels = array();
+						$makerRecord->authorityNumberTypes = array();
+						array_push($makerRecord->authorityNumbers, "123456789 1234");
+						array_push($makerRecord->authorityNumberLabels, "Australian Business Number");
+						array_push($makerRecord->authorityNumberTypes, 1);
+						
+						array_push($makerRecords, $makerRecord);
+						
+						//add 3rd maker record
+						$makerRecord = new ESDRecordMaker();
+						$makerRecord->keyMakerID = "3";
+						$makerRecord->makerCode = "CAR3";
+						$makerRecord->name = "Car Manufacturer B";
+						$makerRecord->makerSearchCode = "Car-Manufacturer-B-Sedans-Wagons";
+						$makerRecord->groupClass = "CUSTOM CARS";
+						$makerRecord->ordering = 1;
+						$makerRecord->establishedDate = 1449132083085;
+						$makerRecord->orgName = "Car Manufacturer B";
+						$makerRecord->authorityNumbers = array();
+						$makerRecord->authorityNumberLabels = array();
+						$makerRecord->authorityNumberTypes = array();
+						array_push($makerRecord->authorityNumbers, "98877664322");
+						array_push($makerRecord->authorityNumberLabels, "Australian Business Number");
+						array_push($makerRecord->authorityNumberTypes, 1);
+						
+						array_push($makerRecords, $makerRecord);
 						
 						//after 60 seconds give up on waiting for a response from the API when importing the organisation data
 						$timeoutMilliseconds = 60000;
 						
-						//add a dataFields attribute that contains a comma delimited list of taxcode record fields that the API is allowed to insert or update in the platform
+						//add a dataFields attribute that contains a comma delimited list of maker record fields that the API is allowed to insert or update in the platform
 						$configs = array();
-						$configs['dataFields'] = 'keyTaxcodeID,taxcode,taxcodeLabel,description,taxcodePercentageRate';
+						$configs['dataFields'] = 'keyMakerID,makerCode,name,makerSearchCode,groupClass,ordering,establishedDate,orgName,authorityNumbers,authorityNumberLabels,authorityNumberTypes';
 						
-						//create taxcode Ecommerce Standards document and add taxcode records to the document
-						$taxcodeESD = new ESDocumentTaxcode(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $taxcodeRecords, $configs);
+						//create maker Ecommerce Standards document and add maker records to the document
+						$makerESD = new ESDocumentMaker(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $makerRecords, $configs);
+						
+						//output the JSON serialised ESD document that will be sent in the API server request
+						echo '<h3>Request Data Serialised:<h3><textarea style="width: 90%; margin: 0 auto;" rows="4">'.htmlentities(json_encode($makerESD)).'</textarea><br/>';
 
-						//send the taxcode document to the API to be imported against the organisation logged into the API
-						$endpointResponseESD = APIv1EndpointOrgImportESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgImportESDocument::IMPORT_TYPE_ID_TAXCODES, $taxcodeESD);
+						//send the maker document to the API to be imported against the organisation logged into the API
+						$endpointResponseESD = APIv1EndpointOrgImportESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgImportESDocument::IMPORT_TYPE_ID_MAKER, $makerESD);
 						
 						//check the result of importing the organisation data
 						if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){

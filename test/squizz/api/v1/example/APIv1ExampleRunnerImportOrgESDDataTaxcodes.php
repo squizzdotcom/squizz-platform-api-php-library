@@ -7,7 +7,7 @@
 			<div>SQUIZZ Pty Ltd</div>
 			<div>Testing SQUIZZ.com API PHP Library: version 1</div>
 			<hr style="max-width: 607px"/>
-			<h1>Import Organisation Data API Example</h1>
+			<h1>Import Taxcode Organisation Data API Example</h1>
 			<p>Tests making a request to the SQUIZZ.com API to create a session for an organisation then makes a call to the API to import data of an organisation into the SQUIZZ.com platform</p>
 			<div style="max-width: 607px; background-color: #2b2b2b; color: #cacaca; text-align: center; margin: auto; padding-top: 15px;">
 				<?php
@@ -119,6 +119,9 @@
 						
 						//create taxcode Ecommerce Standards document and add taxcode records to the document
 						$taxcodeESD = new ESDocumentTaxcode(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $taxcodeRecords, $configs);
+						
+						//output the JSON serialised ESD document that will be sent in the API server request
+						echo '<h3>Request Data Serialised:<h3><textarea style="width: 90%; margin: 0 auto;" rows="4">'.htmlentities(json_encode($taxcodeESD)).'</textarea><br/>';
 
 						//send the taxcode document to the API to be imported against the organisation logged into the API
 						$endpointResponseESD = APIv1EndpointOrgImportESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgImportESDocument::IMPORT_TYPE_ID_TAXCODES, $taxcodeESD);

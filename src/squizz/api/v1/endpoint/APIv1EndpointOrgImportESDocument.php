@@ -1,7 +1,7 @@
 <?php
 
 	/**
-	* Copyright (C) 2017 Squizz PTY LTD
+	* Copyright (C) 2019 Squizz PTY LTD
 	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -31,8 +31,10 @@
 		const IMPORT_TYPE_ID_PRODUCT_PRICE_LEVEL_UNIT_PRICING = 4;
 		const IMPORT_TYPE_ID_PRODUCT_PRICE_LEVEL_QUANTITY_PRICING = 6;
 		const IMPORT_TYPE_ID_PRODUCT_CUSTOMER_ACCOUNT_PRICING = 7;
+		const IMPORT_TYPE_ID_CATEGORY = 8;
 		const IMPORT_TYPE_ID_ALTERNATE_CODES = 9;
 		const IMPORT_TYPE_ID_PRODUCT_STOCK_QUANTITIES = 10;
+		const IMPORT_TYPE_ID_ATTRIBUTE = 11;
 		const IMPORT_TYPE_ID_SALES_REPRESENTATIVES = 16;
 		const IMPORT_TYPE_ID_CUSTOMER_ACCOUNTS = 17;
 		const IMPORT_TYPE_ID_SUPPLIER_ACCOUNTS = 18;
@@ -43,6 +45,9 @@
 		const IMPORT_TYPE_ID_SURCHARGES = 26;
 		const IMPORT_TYPE_ID_PAYMENT_TYPES = 27;
 		const IMPORT_TYPE_ID_SELL_UNITS = 28;
+		const IMPORT_TYPE_ID_MAKER = 44;
+		const IMPORT_TYPE_ID_MAKER_MODEL = 45;
+		const IMPORT_TYPE_ID_MAKER_MODEL_MAPPING = 46;
 		
 		/**
 		* Calls the platform's API endpoint and pushes up and import organisation data in a Ecommerce Standards Document of a specified type
@@ -65,7 +70,7 @@
 				$endpointJSONReader = function($jsonArray, $endpointResponse){
 					$endpointResponse->jsonDeserialize($jsonArray);
 					
-					//deserialize array into sales order ESD
+					//deserialize json data into an ESDocument
 					$jsonMapper = new JsonMapper();
 					$jsonMapper->bEnforceMapType = false;
 					$esDocument = $jsonMapper->map($jsonArray, new ESDocument());
