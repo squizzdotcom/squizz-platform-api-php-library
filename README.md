@@ -129,11 +129,18 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section840](https://w
 
 ### Retrieve Organisation Data Endpoint
 The SQUIZZ.com platform's API has an endpoint that allows a variety of different types of data to be retrieved from another organisation stored on the platform.
-The organisational data that can be retrieved includes products, product stock quantities, and product pricing.
+The organisational data that can be retrieved includes products, product stock quantities, product pricing, product attributes, categories, make/model data and more.
 The data retrieved can be used to allow an organisation to set additional information about products being bought or sold, as well as being used in many other ways.
 Each kind of data retrieved from endpoint is formatted as JSON data conforming to the "Ecommerce Standards Document" standards, with each document containing an array of zero or more records. Use the Ecommerce Standards library to easily read through these documents and records, to find data natively using PHP classes.
-Read [https://www.squizz.com/docs/squizz/Platform-API.html#section969](https://www.squizz.com/docs/squizz/Platform-API.html#section969) for more documentation about the endpoint and its requirements.
+Read [https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Retrieve-Organisation-Data.html](https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Retrieve-Organisation-Data.html) for more documentation about the endpoint and its requirements.
 See the example below on how the call the Retrieve Organisation ESD Data endpoint. Note that a session must first be created in the API before calling the endpoint.
+
+Other examples exist in this repository's examples folder on how to retrieve serveral different types of data. Note that some of these examples show how to different types of data can be retrieved and combined together, showing the interconnected nature of several data types:
+ - Retrieve Categories [APIv1ExampleRunnerRetrieveOrgESDDataCategories.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataCategories.php)
+ - Retrieve Attributes [APIv1ExampleRunnerRetrieveOrgESDDataAttributes.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataAttributes.php)
+ - Retrieve Makers [APIv1ExampleRunnerRetrieveOrgESDDataMakers.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataMakers.php)
+ - Retrieve Maker Models [APIv1ExampleRunnerRetrieveOrgESDDataMakerModels.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataMakerModels.php)
+ - Retrieve Maker Model Mappings [APIv1ExampleRunnerRetrieveOrgESDDataMakerModelMappings.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataMakerModelMappings.php)
 
 ```php
 <?php
@@ -175,13 +182,18 @@ See the example below on how the call the Retrieve Organisation ESD Data endpoin
 	use EcommerceStandardsDocuments\ESDocumentConstants;
 	use EcommerceStandardsDocuments\ESDocumentProduct;
 
-	//obtain or load in an organisation's API credentials, in this example from URL parameters
+	//obtain or load in an organisation's API credentials, in this example from command line arguments
 	$orgID = $_GET["orgID"];
 	$orgAPIKey = $_GET["orgAPIKey"];
 	$orgAPIPass = $_GET["orgAPIPass"];
 	$supplierOrgID = $_GET["supplierOrgID"];
-	$retrieveTypeID = APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRICING;
+	$retrieveTypeID = $_GET["retrieveTypeID"];
+	$customerAccountCode = $_GET["customerAccountCode"];
 	$sessionTimeoutMilliseconds = 60000;
+	
+	//get the first 5000 records. Change the starting index to get the next page of records if 5000 records is returned
+	$recordsMaxAmount = 5000;
+	$recordsStartIndex = 0;
 
 	echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
 
@@ -203,14 +215,14 @@ See the example below on how the call the Retrieve Organisation ESD Data endpoin
 		$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 	}
 
-	//sand and procure purchsae order if the API was successfully created
+	//retrieve organisation data if the API was successfully created
 	if($apiOrgSession->sessionExists())
 	{
 		//after 120 seconds give up on waiting for a response from the API
 		$timeoutMilliseconds = 120000;
 		
-		//call the platform's API to import in the organisation's data, which for this example is product pricing
-		$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, $retrieveTypeID, $supplierOrgID, "");
+		//call the platform's API to retrieve the organisation's data
+		$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex);
 		
 		$esDocument = $endpointResponseESD->esDocument;
 
@@ -300,7 +312,8 @@ See the example below on how the call the Retrieve Organisation ESD Data endpoin
 								"<tr>".
 									"<th>#</th>".
 									"<th>Key Product ID</th>".
-									"<th>Quantity</th>".
+									"<th>Quantity Available</th>".
+									"<th>Quantity Orderable</th>".
 								"</tr>";
 						
 						//iterate through each stock record stored within the standards document
@@ -342,7 +355,7 @@ See the example below on how the call the Retrieve Organisation ESD Data endpoin
 	echo "<div><b>$result</b><div><br/>";
 	echo "<div>Message:<div>";
 	echo "<div><b>$resultMessage</b><div><br/>";
-?>
+	?>
 ```
 
 ### Search Customer Account Records Endpoint
@@ -1697,6 +1710,7 @@ When importing one type of organisational data, it is important to import the fu
 For example if 3 products are imported, then another products import is run that only imports 2 records, then other 1 product will become deactivated and no longer be able to be sold.
 Read [https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Import-Organisation-Data.html](https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Import-Organisation-Data.html) for more documentation about the endpoint and its requirements.
 See the example below on how the call the Import Organisation ESD Data endpoint. Note that a session must first be created in the API before calling the endpoint.
+
 Other examples exist in this repository's examples folder on how to import serveral different types of data:
  - Import Taxcodes [APIv1ExampleRunnerImportOrgESDDataTaxcodes.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataTaxcodes.php)
  - Import Categories [APIv1ExampleRunnerImportOrgESDDataCategories.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataCategories.php)
