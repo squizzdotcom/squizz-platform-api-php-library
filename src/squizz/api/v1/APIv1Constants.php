@@ -83,6 +83,11 @@
 		const API_ORG_ENDPOINT_RETRIEVE_CUSTOMER_ACCOUNT_RECORD_ESD = "retrieve_customer_account_record_esd";
 		
 		/**
+		* name of the platform's API endpoint to call to send a customer invoice from a supplier organisation to a customer organisation
+		*/
+        const API_ORG_ENDPOINT_SEND_CUSTOMER_INVOICE_TO_CUSTOMER = "send_customer_invoice_to_customer";
+		
+		/**
 		* name of the endpoint attribute in the API endpoint response that contains the result code
 		*/
 		const API_ORG_ENDPOINT_ATTRIBUTE_RESULT_CODE = "result_code";
