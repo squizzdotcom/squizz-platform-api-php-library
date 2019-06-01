@@ -24,7 +24,7 @@
 			<div style="max-width: 607px; background-color: #2b2b2b; color: #cacaca; text-align: center; margin: auto; padding-top: 15px;">
 				<?php
 					/**
-					* Copyright (C) 2017 Squizz PTY LTD
+					* Copyright (C) 2019 Squizz PTY LTD
 					* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 					* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 					* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -74,7 +74,10 @@
 					$orgAPIPass = $_GET["orgAPIPass"];
 					$supplierOrgID = $_GET["supplierOrgID"];
 					$retrieveTypeID = $_GET["retrieveTypeID"];
+					$customerAccountCode = $_GET["customerAccountCode"];
 					$sessionTimeoutMilliseconds = 60000;
+					$recordsMaxAmount = 5000;
+					$recordsStartIndex = 0;
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
 					
@@ -102,8 +105,8 @@
 						//after 120 seconds give up on waiting for a response from the API
 						$timeoutMilliseconds = 120000;
 						
-						//call the platform's API to import in the organisation's data, which for this example is product pricing
-						$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, $retrieveTypeID, $supplierOrgID, "");
+						//call the platform's API to retrieve the organisation's data
+						$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex);
 						
 						$esDocument = $endpointResponseESD->esDocument;
 			

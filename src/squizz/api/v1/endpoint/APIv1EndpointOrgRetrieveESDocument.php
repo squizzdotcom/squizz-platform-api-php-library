@@ -1,6 +1,6 @@
 <?php
 	/**
-	* Copyright (C) 2017 Squizz PTY LTD
+	* Copyright (C) 2019 Squizz PTY LTD
 	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -18,6 +18,11 @@
 	use EcommerceStandardsDocuments\ESDocumentProduct;
 	use EcommerceStandardsDocuments\ESDocumentPrice;
 	use EcommerceStandardsDocuments\ESDocumentStockQuantity;
+	use EcommerceStandardsDocuments\ESDocumentCategory;
+	use EcommerceStandardsDocuments\ESDocumentAttribute;
+	use EcommerceStandardsDocuments\ESDocumentMaker;
+	use EcommerceStandardsDocuments\ESDocumentMakerModel;
+	use EcommerceStandardsDocuments\ESDocumentMakerModelMapping;
 	use \JsonMapper;
 
 	/**
@@ -27,8 +32,13 @@
 	class APIv1EndpointOrgRetrieveESDocument
 	{
 		const RETRIEVE_TYPE_ID_PRODUCTS = 3;
+		const RETRIEVE_TYPE_ID_CATEGORIES = 8;
 		const RETRIEVE_TYPE_ID_PRICING = 37;
 		const RETRIEVE_TYPE_ID_PRODUCT_STOCK = 10;
+		const RETRIEVE_TYPE_ID_ATTRIBUTES = 11;
+		const RETRIEVE_TYPE_ID_MAKERS = 44;
+		const RETRIEVE_TYPE_ID_MAKER_MODELS = 45;
+		const RETRIEVE_TYPE_ID_MAKER_MODEL_MAPPINGS = 46;
 		
 		/**
 		* Calls the platform's API endpoint and gets organisation data in a Ecommerce Standards Document of a specified type
@@ -37,9 +47,11 @@
 		* @param retrieveTypeID ID of the type of data to retrieve
 		* @param supplierOrgID unique ID of the supplier organisation in the SQUIZZ.com platform to obtain data from
 		* @param customerAccountCode code of the supplier organisation's customer account. Customer account only needs to be set if the supplier organisation has assigned multiple accounts to the organisation logged into the API session (customer org) and account specific data is being obtained
+		* @param recordsMaxAmount maximum number of records to obtain from the platform
+		* @param recordsStartIndex index containing the position of records to start obtaining from the server
 		* @return APIv1EndpointResponseESD response from calling the API endpoint
 		*/
-		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode)
+		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex)
 		{
 			$requestHeaders = array();
 			$endpointResponse = new APIv1EndpointResponseESD();
@@ -48,8 +60,7 @@
 			
 			try{
 				//set endpoint parameters
-				$endpointParams = "data_type_id=".$retrieveTypeID."&supplier_org_id=".urlencode(utf8_encode($supplierOrgID))."&customer_account_code=".urlencode(utf8_encode($customerAccountCode));
-				
+				$endpointParams = "data_type_id=".$retrieveTypeID."&supplier_org_id=".urlencode(utf8_encode($supplierOrgID))."&customer_account_code=".urlencode(utf8_encode($customerAccountCode))."&records_max_amount=".$recordsMaxAmount."&records_start_index=".$recordsStartIndex;
 				
 				//set the class to use to deserialise the ecommerce standards documents that has been returned from the platform's API
 				switch($retrieveTypeID){
@@ -61,6 +72,21 @@
 						break;
 					case self::RETRIEVE_TYPE_ID_PRODUCT_STOCK:
 						$deserializeESDDocument = new ESDocumentStockQuantity();
+						break;
+					case self::RETRIEVE_TYPE_ID_CATEGORIES:
+						$deserializeESDDocument = new ESDocumentCategory();
+						break;
+					case self::RETRIEVE_TYPE_ID_ATTRIBUTES:
+						$deserializeESDDocument = new ESDocumentAttribute();
+						break;
+					case self::RETRIEVE_TYPE_ID_MAKERS:
+						$deserializeESDDocument = new ESDocumentMaker();
+						break;
+					case self::RETRIEVE_TYPE_ID_MAKER_MODELS:
+						$deserializeESDDocument = new ESDocumentMakerModel();
+						break;
+					case self::RETRIEVE_TYPE_ID_MAKER_MODEL_MAPPINGS:
+						$deserializeESDDocument = new ESDocumentMakerModelMapping();
 						break;
 					default:
 						$callEndpoint = false;
