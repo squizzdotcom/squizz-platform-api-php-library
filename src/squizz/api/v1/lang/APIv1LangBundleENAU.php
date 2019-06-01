@@ -1,6 +1,6 @@
 <?php
 	/**
-	* Copyright (C) 2017 Squizz PTY LTD
+	* Copyright (C) 2019 Squizz PTY LTD
 	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -60,7 +60,19 @@
 			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORDER_MAPPED_PRODUCT_PRICE_NOT_FOUND => "An error occurred when calling SQUIZZ.com's API due to not being able to price a product in the supplier's organisation.",
 			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_CUSTOMER_ACCOUNT_ON_HOLD => "An error occurred when calling SQUIZZ.com's API due to the customer account in the supplier's organisation being on hold and not allowing for further trading activity.",
 			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_CUSTOMER_ACCOUNT_OUTSIDE_BALANCE_LIMIT => "An error occurred when calling SQUIZZ.com's API due to the customer account's balance in the supplier's organisation being over the allowed limit. Not further trading can occur with the account until payments have been made against the account's balance.",
-			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_INCORRECT_DATA_TYPE => "An error occurred when calling SQUIZZ.com's API due to the data type specified not being supported or of the correct type."
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_INCORRECT_DATA_TYPE => "An error occurred when calling SQUIZZ.com's API due to the data type specified not being supported or of the correct type.",
+            APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORDER_MAPPED_PRODUCT_STOCK_NOT_AVAILABLE => "An error occurred when calling SQUIZZ.com's API due to not being able to find available stock for one or more products in the supplier's organisation.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_MAX_SEARCHES_REACHED => "An error occurred when calling SQUIZZ.com's API due to the maximum number search requested being made. Look to wait a few minutes before trying to searh again.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_INCORRECT_RECORD_TYPE => "An error occurred when calling SQUIZZ.com's API due to the wrong or unsupported record type being given.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORDER_TEXT_LINES_ONLY_NOT_ALLOWED => "An error occurred when calling SQUIZZ.com's API due to the supplier organisation not allowing orders that contain only text lines.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_SERVER_ERROR_ORDER_TEXT_LINES_ONLY_NOT_ALLOWED => "An error occurred when calling SQUIZZ.com's API due to the supplier organisation not allowing orders that contain only text lines.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORG_CANNOT_BE_FOUND => "An error occurred when call SQUIZZ.com's API due to no organisation that can be found with the organisation ID provided.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_INVOICE_LINE_NOT_MAPPED => "An error occurred when calling SQUIZZ.com's API due to a line within the invoice not able to be matched up to one of the customer's products, labour, or downloads.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_INVOICE_SURCHARGE_NOT_MAPPED => "An error occurred when calling SQUIZZ.com's API due to a surcharge within the invoice not able to the matched up to one of the customer's surcharges.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_INVOICE_LINE_TAXCODE_NOT_MAPPED => "An error occurred when calling SQUIZZ.com's API due to a line's taxcode within the invoice not able to be matched up to one of the customer's taxcodes.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_INVOICE_SURCHARGE_TAXCODE_NOT_MAPPED => "An error occurred when calling SQUIZZ.com's API due to a surcharge's taxcode within the invoice not able to be matched up to one of the customer's taxcodes.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_NO_ORG_SUPPLIER_ACCOUNT_ASSIGNED => "An error occurred when calling SQUIZZ.com's API due to no supplier account in the customer's organisation able to be found with the given account code.",
+			APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_NO_ORG_SUPPLIER_ACCOUNT_SET => "An error occurred when calling SQUIZZ.com's API due to the customer organisation having no active supplier accounts assigned to the supplier organistion."
 		);
 		
 		public function getString($languageCode)

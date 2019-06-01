@@ -1,6 +1,6 @@
 <?php
 	/**
-	* Copyright (C) 2017 Squizz PTY LTD
+	* Copyright (C) 2019 Squizz PTY LTD
 	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -16,6 +16,10 @@
 	{
 		const ESD_CONFIG_ORDERS_WITH_UNMAPPED_LINES = "orders_with_unmapped_lines";
 		const ESD_CONFIG_ORDERS_WITH_UNPRICED_LINES = "orders_with_unpriced_lines";
+		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_LINES = "invoices_with_unmapped_lines";
+		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_SURCHARGES = "invoices_with_unmapped_surcharges";
+		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_LINE_TAXCODES = "invoices_with_unmapped_line_taxcodes";
+		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_SURCHARGE_TAXCODES = "invoices_with_unmapped_surcharge_taxcodes";
 		
 		//set default values for the response
 		public $result = APIv1EndpointResponse::ENDPOINT_RESULT_FAILURE;
