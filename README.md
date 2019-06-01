@@ -14,6 +14,7 @@ If you are a software developer writing a PHP application then we recommend that
 - You can find more information about the SQUIZZ.com platform by visiting [https://www.squizz.com/docs/squizz](https://www.squizz.com/docs/squizz)
 - To find more information about developing software for the SQUIZZ.com visit [https://www.squizz.com/docs/squizz/Integrate-Software-Into-SQUIZZ.com-Platform.html](https://www.squizz.com/docs/squizz/Integrate-Software-Into-SQUIZZ.com-Platform.html)
 - To find more information about the platform's API visit [https://www.squizz.com/docs/squizz/Platform-API.html](https://www.squizz.com/docs/squizz/Platform-API.html)
+- Examples on how use this library can be found within the files in the [example](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/) directory or in the sections below.
 
 ## Contents
 
@@ -133,6 +134,7 @@ The SQUIZZ.com platform's API has an endpoint that allows a variety of different
 The organisational data that can be retrieved includes products, product stock quantities, product pricing, product attributes, categories, make/model data and more.
 The data retrieved can be used to allow an organisation to set additional information about products being bought or sold, as well as being used in many other ways.
 Each kind of data retrieved from endpoint is formatted as JSON data conforming to the "Ecommerce Standards Document" standards, with each document containing an array of zero or more records. Use the Ecommerce Standards library to easily read through these documents and records, to find data natively using PHP classes.
+The SQUIZZ.com platform API returns collections of records enclosed in an Ecommerce Standards Document. The number of records returned with each request is limited, and may require multiple requests to build a full record set. See example files on how this is done using pagination request parameters.
 Read [https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Retrieve-Organisation-Data.html](https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Retrieve-Organisation-Data.html) for more documentation about the endpoint and its requirements.
 See the example below on how the call the Retrieve Organisation ESD Data endpoint. Note that a session must first be created in the API before calling the endpoint.
 
@@ -1603,7 +1605,7 @@ The endpoint has a number of other requirements. See the endpoint documentation 
 
 Each customer invoice needs to be imported within a "Ecommerce Standards Document" that contains a record for each customer invoice. Use the Ecommerce Standards library to easily create these documents and records.
 It is recommended to only import one customer invoice at a time, since if an array of customer invoices is sent and one invoice fails, then no other invoices in the list will be attempted to import.
-Read [https://www.squizz.com/docs/squizz/Platform-API.html#section961](https://www.squizz.com/docs/squizz/Platform-API.html#section961) for more documentation about the endpoint and its requirements.
+Read [https://www.squizz.com/docs/squizz/Web-Service-Endpoint:-Send-Customer-Invoice-To-Customer.html](https://www.squizz.com/docs/squizz/Web-Service-Endpoint:-Send-Customer-Invoice-To-Customer.html) for more documentation about the endpoint and its requirements.
 See the example below on how the call the Send Customer Invoice To Customer endpoint. Note that a session must first be created in the API before calling the endpoint.
 
 ```php
