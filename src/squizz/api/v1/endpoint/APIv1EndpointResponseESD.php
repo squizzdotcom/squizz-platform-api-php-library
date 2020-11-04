@@ -15,7 +15,11 @@
 	class APIv1EndpointResponseESD
 	{
 		const ESD_CONFIG_ORDERS_WITH_UNMAPPED_LINES = "orders_with_unmapped_lines";
+		const ESD_CONFIG_ORDERS_WITH_UNMATCHED_LINES = "orders_with_unmatched_lines";
 		const ESD_CONFIG_ORDERS_WITH_UNPRICED_LINES = "orders_with_unpriced_lines";
+		const ESD_CONFIG_ORDERS_WITH_UNMATCHED_SURCHARGES = "orders_with_unmatched_surcharges";
+		const ESD_CONFIG_ORDERS_WITH_UNPRICED_SURCHARGES = "orders_with_unpriced_surcharges";
+		const ESD_CONFIG_ORDERS_WITH_UNMATCHED_PAYMENTS = "orders_with_unmatched_payments";
 		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_LINES = "invoices_with_unmapped_lines";
 		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_SURCHARGES = "invoices_with_unmapped_surcharges";
 		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_LINE_TAXCODES = "invoices_with_unmapped_line_taxcodes";

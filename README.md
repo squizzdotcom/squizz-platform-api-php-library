@@ -30,6 +30,7 @@ If you are a software developer writing a PHP application then we recommend that
     * [Send Customer Invoice To Customer Endpoint](#send-customer-invoice-to-customer-endpoint)
     * [Create Organisation Notification Endpoint](#create-organisation-notification-endpoint)
     * [Import Organisation Data Endpoint](#import-organisation-data-endpoint)
+    * [Import Organisation Sales Order Endpoint](#import-organisation-sales-order-endpoint)
     * [Validate Organisation API Session Endpoint](#validate-organisation-api-session-endpoint)
     * [Validate/Create Organisation API Session Endpoint](#validatecreate-organisation-api-session-endpoint)
     * [Destroy Organisation API Session Endpoint](#destroy-organisation-api-session-endpoint)
@@ -365,7 +366,7 @@ Other examples exist in this repository's examples folder on how to retrieve ser
 The SQUIZZ.com platform's API has an endpoint that allows an organisation to search for records within another connected organisation's business sytem, based on records associated to an assigned customer account.
 This endpoint allows an organisation to securely search for invoice, sales order, back order, transactions. credit and payment records, retrieved in realtime from a supplier organisation's connected business system.
 The records returned from endpoint is formatted as JSON data conforming to the "Ecommerce Standards Document" standards, with each document containing an array of zero or more records. Use the Ecommerce Standards library to easily read through these documents and records, to find data natively using PHP classes.
-Read [https://www.squizz.com/docs/squizz/Platform-API.html#section1035](https://www.squizz.com/docs/squizz/Platform-API.html#section1035) for more documentation about the endpoint and its requirements.
+Read [https://www.squizz.com/docs/squizz/Platform-API.html#section1473](https://www.squizz.com/docs/squizz/Platform-API.html#section1473) for more documentation about the endpoint and its requirements.
 See the example below on how the call the Search Customer Account Records endpoint. Note that a session must first be created in the API before calling the endpoint.
 
 ```php
@@ -773,7 +774,7 @@ See the example below on how the call the Search Customer Account Records endpoi
 The SQUIZZ.com platform's API has an endpoint that allows an organisation to retrieve the details and lines for a record from another connected organisation's business sytem, based on a record associated to an assigned customer account.
 This endpoint allows an organisation to securely get the details for a invoice, sales order, back order, transactions. credit or payment record, retrieved in realtime from a supplier organisation's connected business system.
 The record returned from endpoint is formatted as JSON data conforming to the "Ecommerce Standards Document" standards, with the document containing an array of zero or one records. Use the Ecommerce Standards library to easily read through the documents and records, to find data natively using PHP classes.
-Read [https://www.squizz.com/docs/squizz/Platform-API.html#section1036](https://www.squizz.com/docs/squizz/Platform-API.html#section1036) for more documentation about the endpoint and its requirements.
+Read [https://www.squizz.com/docs/squizz/Platform-API.html#section1474](https://www.squizz.com/docs/squizz/Platform-API.html#section1474) for more documentation about the endpoint and its requirements.
 See the example below on how the call the Retrieve Customer Account Records endpoint. Note that a session must first be created in the API before calling the endpoint.
 
 ```php
@@ -2109,6 +2110,421 @@ Other examples exist in this repository's examples folder on how to import serve
 	//destroy API session when done...
 	$apiOrgSession->destroyOrgSession();
 
+	echo "<div>Result:<div>";
+	echo "<div><b>$result</b><div><br/>";
+	echo "<div>Message:<div>";
+	echo "<div><b>$resultMessage</b><div><br/>";
+?>
+```
+
+## Import Organisation Data Endpoint
+The SQUIZZ.com platform's API has an endpoint that allows an organisation to import a sales order into the SQUIZZ.com platform, against its own organisation.
+This endpoint is typically used by an organisation to import sales orders from any systems, websites or services it uses to capture sales orders from, including Ecommerce websites, online marketplaces, Customer Relationship Management (CRM) systems, quoting software tools, or any other business systems and software. 
+Note that this endpoint should not be used by customer organisations to send orders to supplying organisations. For that use case the [Send and Procure Purchase Order From Supplier Endpoint](#send-and-procure-purchase-order-from-supplier-endpoint) should be called instead.
+When calling the endpoint there is an parameter that can optionally allow the order to be re-priced or not. This allows the most up-to-date pricing to be set in the sales order when imported.
+Each sales order needs to be imported as an "Ecommerce Standards Document" that contains one or more records. Use the Ecommerce Standards library to easily create the Sales Order documents and Sales Order records.
+Read [https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Import-Organisation-Sales-Order.html](https://www.squizz.com/docs/squizz/Platform-API-Endpoint:-Import-Organisation-Sales-Order.html) for more documentation about the endpoint and its requirements.
+See the example below on how the call the Import Organisation Sales Order ESD Data endpoint. Note that a session must first be created in the API before calling the endpoint.
+
+![alt tag](https://attach.squizz.com/doc_centre/1/files/images/masters/squizz-platform-api-import-sales-order-diagram[130].png)
+
+```php
+<?php
+	//set automatic loader of the library's classes
+	spl_autoload_register(function($className) {
+		$className = ltrim($className, '\\');
+		$fileName  = '';
+		$namespace = '';
+		if ($lastNsPos = strripos($className, '\\')) {
+			$namespace = substr($className, 0, $lastNsPos);
+			$className = substr($className, $lastNsPos + 1);
+			$fileName  = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+		}
+		$fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+		
+		$apiNamespace = "squizz\\api\\v1";
+		$esdNamespace = "EcommerceStandardsDocuments";
+		$esdInstallPath = "/path/to/esd-php-library/src/";
+		
+		//set absolute path to API php class files
+		if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
+			$fileName = $_SERVER['DOCUMENT_ROOT']. '/src/' . $fileName;
+		}
+		//set absolute path to ESD library files
+		else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
+			$fileName = $esdInstallPath . $fileName;
+		}
+		
+		require $fileName;
+	});
+	
+	use squizz\api\v1\endpoint\APIv1EndpointResponse;
+	use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+	use squizz\api\v1\endpoint\APIv1EndpointOrgImportSalesOrder;
+	use squizz\api\v1\APIv1OrgSession;
+	use squizz\api\v1\APIv1Constants;
+	use EcommerceStandardsDocuments\ESDRecordOrderSale;
+	use EcommerceStandardsDocuments\ESDRecordOrderSaleLine;
+	use EcommerceStandardsDocuments\ESDRecordOrderLineTax;
+	use EcommerceStandardsDocuments\ESDRecordOrderSurcharge;
+	use EcommerceStandardsDocuments\ESDRecordOrderPayment;
+	use EcommerceStandardsDocuments\ESDocumentConstants;
+	use EcommerceStandardsDocuments\ESDocumentOrderSale;
+	
+	//obtain or load in an organisation's API credentials, in this example from command line arguments
+	$orgID = $_GET["orgID"];
+	$orgAPIKey = $_GET["orgAPIKey"];
+	$orgAPIPass = $_GET["orgAPIPass"];
+	$rePriceOrder = $_GET["rePriceOrder"];
+	$sessionTimeoutMilliseconds = 60000;
+	
+	echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
+	
+	//create an API session instance
+	$apiOrgSession = new APIv1OrgSession($orgID, $orgAPIKey, $orgAPIPass, $sessionTimeoutMilliseconds, APIv1Constants::SUPPORTED_LOCALES_EN_AU);
+	
+	//call the platform's API to request that a session is created
+	$endpointResponse = $apiOrgSession->createOrgSession();
+	
+	//check if the organisation's credentials were correct and that a session was created in the platform's API
+	$result = "FAIL";
+	$resultMessage = "";
+	if($endpointResponse->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
+	{
+	}
+	else
+	{
+		//session failed to be created
+		$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
+	}
+	
+	//create and send sales order if the API was successfully created
+	if($apiOrgSession->sessionExists())
+	{
+		//create sales order record to import
+		$salesOrderRecord = new ESDRecordOrderSale();
+		
+		//set data within the sales order
+		$salesOrderRecord->keySalesOrderID = "111";
+		$salesOrderRecord->salesOrderCode = "SOEXAMPLE-678";
+		$salesOrderRecord->salesOrderNumber = "678";
+		$salesOrderRecord->instructions = "Leave goods at the back entrance";
+		//$salesOrderRecord->keyCustomerAccountID = "3";
+		$salesOrderRecord->keyCustomerAccountID = "1";
+		$salesOrderRecord->customerAccountCode = "CUS-003";
+		$salesOrderRecord->customerAccountName = "Acme Industries";
+		$salesOrderRecord->customerEntity = ESDocumentConstants::ENTITY_TYPE_ORG;
+		$salesOrderRecord->customerOrgName = "Acme Industries Pty Ltd";
+
+		//set delivery address that ordered goods will be delivered to
+		$salesOrderRecord->deliveryAddress1 = "32";
+		$salesOrderRecord->deliveryAddress2 = "Main Street";
+		$salesOrderRecord->deliveryAddress3 = "Melbourne";
+		$salesOrderRecord->deliveryRegionName = "Victoria";
+		$salesOrderRecord->deliveryCountryName = "Australia";
+		$salesOrderRecord->deliveryPostcode = "3000";
+		$salesOrderRecord->deliveryOrgName = "Acme Industries";
+		$salesOrderRecord->deliveryContact = "Jane Doe";
+
+		//set billing address that the order will be billed to for payment
+		$salesOrderRecord->billingAddress1 = "43";
+		$salesOrderRecord->billingAddress2 = " High Street";
+		$salesOrderRecord->billingAddress3 = "Melbourne";
+		$salesOrderRecord->billingRegionName = "Victoria";
+		$salesOrderRecord->billingCountryName = "Australia";
+		$salesOrderRecord->billingPostcode = "3000";
+		$salesOrderRecord->billingOrgName = "Acme Industries International";
+		$salesOrderRecord->billingContact = "John Citizen";
+		
+		//create an array of sales order lines
+		$orderLines = array();
+		
+		//create sales order line record
+		$orderProduct = new ESDRecordOrderSaleLine();
+		$orderProduct->lineType = ESDocumentConstants::ORDER_LINE_TYPE_PRODUCT;
+		//set mandatory data in line fields
+		$orderProduct->productCode = "TEA-TOWEL-GREEN";
+		$orderProduct->productName = "Green tea towel - 30 x 6 centimetres";
+		$orderProduct->quantity = 4;
+		$orderProduct->keySellUnitID = "EA";
+		$orderProduct->unitName = "EACH";
+		$orderProduct->sellUnitBaseQuantity = 4;
+		//pricing data only needs to be set if the order isn't being repriced
+		$orderProduct->priceExTax = 5.00;
+		$orderProduct->priceIncTax = 5.50;
+		$orderProduct->priceTax = 0.50;
+		$orderProduct->priceTotalIncTax = 22.00;
+		$orderProduct->priceTotalExTax = 20.00;
+		$orderProduct->priceTotalTax = 2.00;
+		
+		//add order line to lines list
+		array_push($orderLines, $orderProduct);
+		
+		//add taxes to the line
+		$orderLineTaxes = array();
+		$orderProduct->taxes = $orderLineTaxes;
+		$orderProductTax = new ESDRecordOrderLineTax();
+		$orderProductTax->keyTaxcodeID = "TAXCODE-1";
+		$orderProductTax->taxcode = "GST";
+		$orderProductTax->taxcodeLabel = "Goods And Services Tax";
+		//pricing data only needs to be set if the order isn't being repriced
+		$orderProductTax->priceTax = 0.50;
+		$orderProductTax->taxRate = 10;
+		$orderProductTax->quantity = 4;
+		$orderProductTax->priceTotalTax = 2.00;
+		array_push($orderLineTaxes, $orderProductTax);
+		
+		//add a 2nd sales order line record that is a text line
+		$orderProduct = new ESDRecordOrderSaleLine();
+		$orderProduct->lineType = ESDocumentConstants::ORDER_LINE_TYPE_TEXT;
+		$orderProduct->textDescription = "Please bundle tea towels into a box";
+		array_push($orderLines, $orderProduct);
+		
+		//add a 3rd sales order line record
+		$orderProduct = new ESDRecordOrderSaleLine();
+		$orderProduct->lineType = ESDocumentConstants::ORDER_LINE_TYPE_PRODUCT;
+		$orderProduct->productCode = "TEA-TOWEL-BLUE";
+		$orderProduct->productName = "Blue tea towel - 30 x 6 centimetres";
+		$orderProduct->unitName = "BOX";
+		$orderProduct->keySellUnitID = "BOX-OF-10";
+		$orderProduct->quantity = 2;
+		$orderProduct->sellUnitBaseQuantity = 20;
+		//pricing data only needs to be set if the order isn't being repriced
+		$orderProduct->priceExTax = 10.00;
+		$orderProduct->priceIncTax = 11.00;
+		$orderProduct->priceTax = 1.00;
+		$orderProduct->priceTotalIncTax = 22.00;
+		$orderProduct->priceTotalExTax = 20.00;
+		$orderProduct->priceTotalTax = 2.00;
+		array_push($orderLines, $orderProduct);
+		
+		//add taxes to the line
+		$orderLineTaxes = array();
+		$orderProduct->taxes = $orderLineTaxes;
+		$orderProductTax = new ESDRecordOrderLineTax();
+		$orderProductTax->keyTaxcodeID = "TAXCODE-1";
+		$orderProductTax->taxcode = "GST";
+		$orderProductTax->taxcodeLabel = "Goods And Services Tax";
+		//pricing data only needs to be set if the order isn't being repriced
+		$orderProductTax->priceTax = 1.00;
+		$orderProductTax->taxRate = 10;
+		$orderProductTax->quantity = 2;
+		$orderProductTax->priceTotalTax = 2.00;
+		array_push($orderLineTaxes, $orderProductTax);
+		
+		//add order lines to the order
+		$salesOrderRecord->lines = $orderLines;
+		
+		//create an array of sales order surcharges
+		$orderSurcharges = array();
+		
+		//create sales order surcharge record
+		$orderSurcharge = new ESDRecordOrderSurcharge();
+		$orderSurcharge->surchargeCode = "FREIGHT-FEE";
+		$orderSurcharge->surchargeLabel = "Freight Surcharge";
+		$orderSurcharge->surchargeDescription = "Cost of freight delivery";
+		$orderSurcharge->keySurchargeID = "SURCHARGE-1";
+		//pricing data only needs to be set if the order isn't being repriced
+		$orderSurcharge->priceExTax = 3.00;
+		$orderSurcharge->priceIncTax = 3.30;
+		$orderSurcharge->priceTax = 0.30;
+		array_push($orderSurcharges, $orderSurcharge);
+		
+		//add taxes to the surcharge
+		$orderSurchargeTaxes = array();
+		$orderSurcharge->taxes = $orderSurchargeTaxes;
+		$orderSurchargeTax = new ESDRecordOrderLineTax();
+		$orderSurchargeTax->keyTaxcodeID = "TAXCODE-1";
+		$orderSurchargeTax->taxcode = "GST";
+		$orderSurchargeTax->taxcodeLabel = "Goods And Services Tax";
+		$orderSurchargeTax->quantity = 1;
+		//pricing data only needs to be set if the order isn't being repriced
+		$orderSurchargeTax->priceTax = 0.30;
+		$orderSurchargeTax->taxRate = 10;
+		$orderSurchargeTax->priceTotalTax = 0.30;
+		array_push($orderSurchargeTaxes, $orderSurchargeTax);
+		
+		//create 2nd sales order surcharge record
+		$orderSurcharge = new ESDRecordOrderSurcharge();
+		$orderSurcharge->surchargeCode = "PAYMENT-FEE";
+		$orderSurcharge->surchargeLabel = "Credit Card Surcharge";
+		$orderSurcharge->surchargeDescription = "Cost of Credit Card Payment";
+		$orderSurcharge->keySurchargeID = "SURCHARGE-2";
+		//pricing data only needs to be set if the order isn't being repriced
+		$orderSurcharge->priceExTax = 5.00;
+		$orderSurcharge->priceIncTax = 5.50;
+		$orderSurcharge->priceTax = 0.50;
+		array_push($orderSurcharges, $orderSurcharge);
+		
+		//add taxes to the 2nd surcharge
+		$orderSurchargeTaxes = array();
+		$orderSurcharge->taxes = $orderSurchargeTaxes;
+		$orderSurchargeTax = new ESDRecordOrderLineTax();
+		$orderSurchargeTax->keyTaxcodeID = "TAXCODE-1";
+		$orderSurchargeTax->taxcode = "GST";
+		$orderSurchargeTax->taxcodeLabel = "Goods And Services Tax";
+		//pricing data only needs to be set if the order isn't being repriced
+		$orderSurchargeTax->priceTax = 0.50;
+		$orderSurchargeTax->taxRate = 10;
+		$orderSurchargeTax->quantity = 1;
+		$orderSurchargeTax->priceTotalTax = 5.00;
+		array_push($orderSurchargeTaxes, $orderSurchargeTax);
+		
+		//add surcharges to the order
+		$salesOrderRecord->surcharges = $orderSurcharges;
+		
+		//create an array of sales order payments
+		$orderPayments = array();
+		
+		//create sales order payment record
+		$orderPayment = new ESDRecordOrderPayment();
+		$orderPayment->paymentMethod = ESDocumentConstants::PAYMENT_METHOD_CREDIT;
+		$orderPayment->paymentProprietaryCode = "Freight Surcharge";
+		$orderPayment->paymentReceipt = "3422ads2342233";
+		$orderPayment->keyPaymentTypeID = "VISA-CREDIT-CARD";
+		$orderPayment->paymentAmount = 22.80;
+		array_push($orderPayments, $orderPayment);
+		
+		//create 2nd sales order payment record
+		$orderPayment = new ESDRecordOrderPayment();
+		$orderPayment->paymentMethod = ESDocumentConstants::PAYMENT_METHOD_PROPRIETARY;
+		$orderPayment->paymentProprietaryCode = "PAYPAL";
+		$orderPayment->paymentReceipt = "2323432341231";
+		$orderPayment->keyPaymentTypeID = "PP";
+		$orderPayment->paymentAmount = 30.00;
+		array_push($orderPayments, $orderPayment);
+		
+		//add payments to the order and set overall payment details
+		$salesOrderRecord->payments = $orderPayments;
+		$salesOrderRecord->paymentAmount = 41.00;
+		$salesOrderRecord->paymentStatus = ESDocumentConstants::PAYMENT_STATUS_PAID;
+		
+		//set order totals, pricing data only needs to be set if the order isn't being repriced
+		$salesOrderRecord->totalPriceIncTax = 52.80;
+		$salesOrderRecord->totalPriceExTax = 48.00;
+		$salesOrderRecord->totalTax = 4.80;
+		$salesOrderRecord->totalSurchargeExTax = 8.00;
+		$salesOrderRecord->totalSurchargeIncTax = 8.80;
+		$salesOrderRecord->totalSurchargeTax = 8.00;
+	
+		//create sales order records list and add sales order to it
+		$salesOrderRecords = array();
+		array_push($salesOrderRecords, $salesOrderRecord);
+		
+		//after 60 seconds give up on waiting for a response from the API when importing the order
+		$timeoutMilliseconds = 60000;
+		
+		//create sales order Ecommerce Standards document and add sales order records to the document
+		$orderSaleESD = new ESDocumentOrderSale(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $salesOrderRecords, array());
+
+		//send sales order document to the API for importing agqainst the organisation
+		$endpointResponseESD = APIv1EndpointOrgImportSalesOrder::call($apiOrgSession, $timeoutMilliseconds, $orderSaleESD, ($rePriceOrder == ESDocumentConstants::ESD_VALUE_YES));
+		$esDocumentOrderSale = $endpointResponseESD->esDocument;
+		
+		//check the result of importing the sales order
+		if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
+			$result = "SUCCESS";
+			$resultMessage = "Organisation sales order(s) have successfully been imported against the organisation.";
+			
+			//iterate through each of the returned sales orders and output the details of the sales order(s)
+			if($esDocumentOrderSale->dataRecords != null){
+				foreach($esDocumentOrderSale->dataRecords as &$salesOrderRecord)
+				{								
+					$resultMessage = $resultMessage . "<br/><br/>Sales Order Returned, Order Details: <br/>";
+					$resultMessage = $resultMessage . "Sales Order Code: " . $salesOrderRecord->salesOrderCode . "<br/>";
+					$resultMessage = $resultMessage . "Sales Order Total Cost: " . $salesOrderRecord->totalPriceIncTax . " (" . $salesOrderRecord->currencyISOCode . ")" . "<br/>";
+					$resultMessage = $resultMessage . "Sales Order Total Taxes: " . $salesOrderRecord->totalTax . " (" . $salesOrderRecord->currencyISOCode . ")" . "<br/>";
+					$resultMessage = $resultMessage . "Sales Order Customer Account: " . $salesOrderRecord->customerAccountCode . "<br/>";
+					$resultMessage = $resultMessage . "Sales Order Total Lines: " . $salesOrderRecord->totalLines;
+				}
+			}
+		}else{
+			$result = "FAIL";
+			$resultMessage = "Organisation sales order(s) failed to be processed. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
+			
+			//if one or more products in the sales order could not match a product for the organisation then find out the order lines that caused the problem
+			if($endpointResponseESD->result_code == APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORDER_PRODUCT_NOT_MATCHED && $esDocumentOrderSale != null)
+			{
+				//get a list of order lines that could not be mapped
+				$unmatchedLines = APIv1EndpointOrgImportSalesOrder::getUnmatchedOrderLines($esDocumentOrderSale);
+				
+				//iterate through each unmatched order line
+				foreach($unmatchedLines as $orderIndex => $lineIndex)
+				{								
+					//check that the order can be found that contains the problematic line
+					if($orderIndex < count($orderSaleESD->dataRecords) && $lineIndex < count($orderSaleESD->dataRecords[$orderIndex]->lines)){
+						$resultMessage = $resultMessage . "<br/>For sales order: " . $orderSaleESD->dataRecords[$orderIndex]->salesOrderCode . " a matching product for line number: " . ($lineIndex+1) . " could not be found.";
+					}
+				}
+			}
+			//if one or more products in the sales order could not be priced for the organisation then find the order line that caused the problem
+			elseif($endpointResponseESD->result_code == APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORDER_LINE_PRICING_MISSING && $esDocumentOrderSale != null)
+			{
+				//get a list of order lines that could not be priced
+				$unpricedLines = APIv1EndpointOrgImportSalesOrder::getUnpricedOrderLines($esDocumentOrderSale);
+
+				//iterate through each unpriced order line
+				foreach($unpricedLines as $orderIndex => $lineIndex)
+				{
+					//check that the order can be found that contains the problematic line
+					if($orderIndex < count($orderSaleESD->dataRecords) && $lineIndex < count($orderSaleESD->dataRecords[$orderIndex]->lines)){
+						$resultMessage = $resultMessage . "For sales order: " . $orderSaleESD->dataRecords[$orderIndex]->salesOrderCode . " no pricing found for line number: " . ($lineIndex+1);
+					}
+				}
+			}
+			//if one or more surcharges in the sales order could not match a surcharge for the organisation then find out the order surcharge that caused the problem
+			elseif($endpointResponseESD->result_code == APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORDER_SURCHARGE_NOT_FOUND && $esDocumentOrderSale != null)
+			{
+				//get a list of order surcharges that could not be matched
+				$unmatchedSurcharges = APIv1EndpointOrgImportSalesOrder::getUnmatchedOrderSurcharges($esDocumentOrderSale);
+				
+				//iterate through each unmatched order surcharge
+				foreach($unmatchedSurcharges as $orderIndex => $surchargeIndex)
+				{								
+					//check that the order can be found that contains the problematic surcharge
+					if($orderIndex < count($orderSaleESD->dataRecords) && $surchargeIndex < count($orderSaleESD->dataRecords[$orderIndex]->surcharges)){
+						$resultMessage = $resultMessage . "<br/>For sales order: " . $orderSaleESD->dataRecords[$orderIndex]->salesOrderCode . " a matching surcharge for surcharge number: " . ($surchargeIndex+1) . " could not be found.";
+					}
+				}
+			}
+			//if one or more surcharges in the sales order could not be priced then find the order surcharge that caused the problem
+			elseif($endpointResponseESD->result_code == APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORDER_SURCHARGE_PRICING_MISSING && $esDocumentOrderSale != null)
+			{
+				//get a list of order lines that could not be priced
+				$unpricedSurcharges = APIv1EndpointOrgImportSalesOrder::getUnpricedOrderSurcharges($esDocumentOrderSale);
+
+				//iterate through each unpriced order surcharge
+				foreach($unpricedSurcharges as $orderIndex => $surchargeIndex)
+				{
+					//check that the order can be found that contains the problematic surcharge
+					if($orderIndex < count($orderSaleESD->dataRecords) && $surchargeIndex < count($orderSaleESD->dataRecords[$orderIndex]->surcharges)){
+						$resultMessage = $resultMessage . "For sales order: " . $orderSaleESD->dataRecords[$orderIndex]->salesOrderCode . " no pricing found for surcharge number: " . ($surchargeIndex+1);
+					}
+				}
+			}
+			//if one or more surcharges in the sales order could not match a surcharge for the organisation then find out the order surcharge that caused the problem
+			elseif($endpointResponseESD->result_code == APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_ORDER_PAYMENT_NOT_MATCHED && $esDocumentOrderSale != null)
+			{
+				//get a list of order payments that could not be matched
+				$unmatchedPayments = APIv1EndpointOrgImportSalesOrder::getUnmatchedOrderPayments($esDocumentOrderSale);
+				
+				//iterate through each unmatched order payment
+				foreach($unmatchedPayments as $orderIndex => $paymentIndex)
+				{								
+					//check that the order can be found that contains the problematic payment
+					if($orderIndex < count($orderSaleESD->dataRecords) && $paymentIndex < count($orderSaleESD->dataRecords[$orderIndex]->payments)){
+						$resultMessage = $resultMessage . "<br/>For sales order: " . $orderSaleESD->dataRecords[$orderIndex]->salesOrderCode . " a matching payment type for payment number: " . ($paymentIndex+1) . " could not be found.";
+					}
+				}
+			}
+		}
+	}
+	
+	//next steps
+	//call other API endpoints...
+	//destroy API session when done...
+	$apiOrgSession->destroyOrgSession();
+	
 	echo "<div>Result:<div>";
 	echo "<div><b>$result</b><div><br/>";
 	echo "<div>Message:<div>";
