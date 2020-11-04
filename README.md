@@ -2117,7 +2117,7 @@ Other examples exist in this repository's examples folder on how to import serve
 ?>
 ```
 
-## Import Organisation Data Endpoint
+## Import Organisation Sales Order Endpoint
 The SQUIZZ.com platform's API has an endpoint that allows an organisation to import a sales order into the SQUIZZ.com platform, against its own organisation.
 This endpoint is typically used by an organisation to import sales orders from any systems, websites or services it uses to capture sales orders from, including Ecommerce websites, online marketplaces, Customer Relationship Management (CRM) systems, quoting software tools, or any other business systems and software. 
 Note that this endpoint should not be used by customer organisations to send orders to supplying organisations. For that use case the [Send and Procure Purchase Order From Supplier Endpoint](#send-and-procure-purchase-order-from-supplier-endpoint) should be called instead.
