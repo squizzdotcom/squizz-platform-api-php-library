@@ -19,15 +19,15 @@
 			<div>SQUIZZ Pty Ltd</div>
 			<div>Testing SQUIZZ.com API PHP Library: version 1</div>
 			<hr style="max-width: 607px"/>
-			<h1>Retrieve Maker Model Mapping Organisation Data API Example</h1>
+			<h1>Retrieve Product Organisation Data API Example</h1>
 			<p style="text-align: left; max-width: 607px; margin: 0 auto;">
-				Tests making a request to the SQUIZZ.com API to create a session for an organisation, then makes a call to the API to retrieve Maker Model Mapping data from a chosen organisation.<br/><br/>
+				Tests making a request to the SQUIZZ.com API to create a session for an organisation, then makes a call to the API to retrieve Product data from a chosen organisation.<br/><br/>
 			</p>
 			
 			<div style="max-width: 607px; background-color: #2b2b2b; color: #cacaca; text-align: center; margin: auto; padding-top: 15px;">
 				<?php
 					/**
-					* Copyright (C) 2019 Squizz PTY LTD
+					* Copyright (C) Squizz PTY LTD
 					* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 					* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 					* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -67,19 +67,9 @@
 					use squizz\api\v1\APIv1OrgSession;
 					use squizz\api\v1\APIv1Constants;
 					use EcommerceStandardsDocuments\ESDocumentConstants;
-					use EcommerceStandardsDocuments\ESDRecordMaker;
-					use EcommerceStandardsDocuments\ESDRecordMakerModel;
-					use EcommerceStandardsDocuments\ESDRecordMakerModelMapping;
+					use EcommerceStandardsDocuments\ESDocument;
 					use EcommerceStandardsDocuments\ESDRecordProduct;
-					use EcommerceStandardsDocuments\ESDRecordCategory;
-					use EcommerceStandardsDocuments\ESDRecordAttribute;
-					use EcommerceStandardsDocuments\ESDRecordAttributeProfile;
-					use EcommerceStandardsDocuments\ESDRecordAttributeValue;
 					use EcommerceStandardsDocuments\ESDocumentProduct;
-					use EcommerceStandardsDocuments\ESDocumentCategory;
-					use EcommerceStandardsDocuments\ESDocumentMaker;
-					use EcommerceStandardsDocuments\ESDocumentMakerModel;
-					use EcommerceStandardsDocuments\ESDocumentMakerModelMapping;
 					
 					//obtain or load in an organisation's API credentials, in this example from command line arguments
 					$orgID = $_GET["orgID"];
@@ -92,11 +82,6 @@
 					$getMoreRecords = true;
 					$recordNumber = 1;
 					$resultMessage = "";
-					$makerModelsRecordIndex = array();
-					$attributeProfilesRecordIndex = array();
-					$attributesRecordIndex = array();
-					$productsRecordIndex = array();
-					$categoriesRecordIndex = array();
 					
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
@@ -119,178 +104,8 @@
 						$resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
 					}
 					
-					//first retrieve and index organisation maker model data if the API session was successfully created
+					//retrieve organisation product data and display product records
 					if($apiOrgSession->sessionExists())
-					{
-						//after 120 seconds give up on waiting for a response from the API
-						$timeoutMilliseconds = 120000;
-						
-						//get the next page of records if needed
-						while($getMoreRecords)
-						{
-							//call the platform's API to retrieve the organisation's maker model data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_MAKER_MODEL, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
-							
-							$getMoreRecords = false;
-							$esDocument = $endpointResponseESD->esDocument;
-				
-							//check that the data successfully retrieved
-							if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
-							{
-								//check that records have been placed into the standards document
-								if($esDocument->dataRecords != null)
-								{
-									//iterate through each maker model record stored within the standards document and index
-									foreach ($esDocument->dataRecords as $makerModelRecord){
-										$makerModelsRecordIndex[$makerModelRecord->keyMakerModelID] = $makerModelRecord;
-									}
-									
-									//check if there are more records to retrieve
-									if(sizeof($esDocument->dataRecords) >= $recordsMaxAmount)
-									{
-										$recordsStartIndex = $recordsStartIndex + $recordsMaxAmount;
-										$getMoreRecords = true;
-									}else{
-										$result = "SUCCESS";
-									}
-								}
-							}else{
-								$result = "FAIL";
-								$resultMessage = "Organisation Maker Model data failed to be obtained from the platform. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
-							}
-						}
-					}
-					
-					//next retrieve and index organisation attribute data if the maker model data was retrieved
-					if($result=="SUCCESS")
-					{
-						$result = "FAIL";
-						$recordsStartIndex = 0;
-					
-						//after 120 seconds give up on waiting for a response from the API
-						$timeoutMilliseconds = 120000;
-						
-						//call the platform's API to retrieve the organisation's attribute data
-						$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_ATTRIBUTE, $supplierOrgID, '', 5000, 0);
-						$getMoreRecords = false;
-						$esDocument = $endpointResponseESD->esDocument;
-			
-						//check that the data successfully retrieved
-						if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
-						{		
-							//check that records have been placed into the standards document
-							if($esDocument->attributeProfiles != null)
-							{
-								//iterate through each attribute profile record stored within the standards document
-								foreach ($esDocument->attributeProfiles as $attributeProfileRecord){
-									$attributeProfilesRecordIndex[$attributeProfileRecord->keyAttributeProfileID] = $attributeProfileRecord;
-									
-									//iterate through each attribute assigned to the attribute profile
-									foreach ($attributeProfileRecord->attributes as $attributeRecord){
-										$attributesRecordIndex[$attributeRecord->keyAttributeID] = $attributeRecord;
-									}
-								}
-								
-								$result = "SUCCESS";
-							}
-						}else{
-							$result = "FAIL";
-							$resultMessage = "Organisation Attribute data failed to be obtained from the platform. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
-						}
-					}
-					
-					//next retrieve and index organisation product data if the attribute data was retrieved
-					if($result=="SUCCESS")
-					{
-						$result = "FAIL";
-						$recordsStartIndex = 0;
-						
-						//after 120 seconds give up on waiting for a response from the API
-						$timeoutMilliseconds = 120000;
-						
-						//get the next page of records if needed
-						while($getMoreRecords)
-						{
-							//call the platform's API to retrieve the organisation's product data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCT, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
-							
-							$getMoreRecords = false;
-							$esDocument = $endpointResponseESD->esDocument;
-				
-							//check that the data successfully retrieved
-							if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
-							{
-								//check that records have been placed into the standards document
-								if($esDocument->dataRecords != null)
-								{
-									//iterate through each product record stored within the standards document and index
-									foreach ($esDocument->dataRecords as $productRecord){
-										$productsRecordIndex[$productRecord->keyProductID] = $productRecord;
-									}
-									
-									//check if there are more records to retrieve
-									if(sizeof($esDocument->dataRecords) >= $recordsMaxAmount)
-									{
-										$recordsStartIndex = $recordsStartIndex + $recordsMaxAmount;
-										$getMoreRecords = true;
-									}else{
-										$result = "SUCCESS";
-									}
-								}
-							}else{
-								$result = "FAIL";
-								$resultMessage = "Organisation Product data failed to be obtained from the platform. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
-							}
-						}
-					}
-					
-					//next retrieve and index organisation category data if the attribute data was retrieved
-					if($result=="SUCCESS")
-					{
-						$result = "FAIL";
-						$recordsStartIndex = 0;
-						
-						//after 120 seconds give up on waiting for a response from the API
-						$timeoutMilliseconds = 120000;
-						
-						//get the next page of records if needed
-						while($getMoreRecords)
-						{
-							//call the platform's API to retrieve the organisation's category data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_CATEGORY, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
-							
-							$getMoreRecords = false;
-							$esDocument = $endpointResponseESD->esDocument;
-				
-							//check that the data successfully retrieved
-							if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
-							{
-								//check that records have been placed into the standards document
-								if($esDocument->dataRecords != null)
-								{
-									//iterate through each category record stored within the standards document and index
-									foreach ($esDocument->dataRecords as $categoryRecord){
-										$categoriesRecordIndex[$productRecord->keyProductID] = $categoryRecord;
-									}
-									
-									//check if there are more records to retrieve
-									if(sizeof($esDocument->dataRecords) >= $recordsMaxAmount)
-									{
-										$recordsStartIndex = $recordsStartIndex + $recordsMaxAmount;
-										$getMoreRecords = true;
-									}else{
-										$result = "SUCCESS";
-									}
-								}
-							}else{
-								$result = "FAIL";
-								$resultMessage = "Organisation Category data failed to be obtained from the platform. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
-							}
-						}
-					}
-					
-					//retrieve organisation maker model mapping data after attribute profile data has been successfully retrieved
-					if($result=="SUCCESS")
 					{
 						$result = "FAIL";
 						$recordsStartIndex = 0;
@@ -302,8 +117,8 @@
 						//get the next page of records if needed
 						while($getMoreRecords)
 						{
-							//call the platform's API to retrieve the organisation's maker model mapping data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_MAKER_MODEL_MAPPING, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
+							//call the platform's API to retrieve the organisation's product data
+							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCTS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
 							$getMoreRecords = false;
 							$esDocument = $endpointResponseESD->esDocument;
 				
@@ -316,110 +131,29 @@
 									//output headers for the first page of records
 									if($recordsStartIndex == 0){
 										$resultMessage = $resultMessage.
-											"Organisation data successfully obtained from the platform".
-											"<br/>Maker Model Records:".
+											"Product data successfully obtained from the platform".
+											"<br/>Product Records:".
 											'<table style="width: 100%; display: block; overflow-x: auto;white-space: nowrap;">'.
 												"<tr>".
 													"<th>#</th>".
-													"<th>Key Maker Model ID</th>".
-													"<th>Model Code</th>".
-													"<th>Model Name</th>".
-													"<th>Key Category ID</th>".
-													"<th>Category Code</th>".
-													"<th>Category Name</th>".
 													"<th>Key Product ID</th>".
 													"<th>Product Code</th>".
 													"<th>Product Name</th>".
-													"<th>Quantity</th>".
+													"<th>Description 1</th>".
 												"</tr>";
 									}
 									
-									//iterate through each model mapping record stored within the standards document
-									foreach ($esDocument->dataRecords as $modelMappingRecord)
+									//iterate through each prodcut record stored within the standards document
+									foreach ($esDocument->dataRecords as $productRecord)
 									{
-										$modelCode = '';
-										$modelName = '';
-										$categoryCode = '';
-										$categoryName = '';
-										$productCode = '';
-										$productName = '';
-										
-										//lookup the mapping's model and gets the model name and code
-										if(array_key_exists($modelMappingRecord->keyMakerModelID, $makerModelsRecordIndex)){
-											$modelCode = $makerModelsRecordIndex[$modelMappingRecord->keyMakerModelID]->modelCode;
-											$modelName = $makerModelsRecordIndex[$modelMappingRecord->keyMakerModelID]->name;
-										}
-										
-										//lookup the mapping's category and gets the category name and code
-										if(array_key_exists($modelMappingRecord->keyMakerID, $categoriesRecordIndex)){
-											$categoryCode = $categoriesRecordIndex[$modelMappingRecord->keyCategoryID]->categoryCode;
-											$categoryName = $categoriesRecordIndex[$modelMappingRecord->keyCategoryID]->name;
-										}
-										
-										//lookup the mapping's product and gets the product name and code
-										if(array_key_exists($modelMappingRecord->keyMakerID, $categoriesRecordIndex)){
-											$productCode = $categoriesRecordIndex[$modelMappingRecord->keyProductID]->productCode;
-											$productName = $categoriesRecordIndex[$modelMappingRecord->keyProductID]->name;
-										}
-									
 										//output details of the record
 										$resultMessage = $resultMessage."<tr>".
 											"<td>".$recordNumber."</td>".
-											"<td>".$modelMappingRecord->keyMakerModelID."</td>".
-											"<td>".$modelCode."</td>".
-											"<td>".$modelName."</td>".
-											"<td>".$modelMappingRecord->keyCategoryID."</td>".
-											"<td>".$categoryCode."</td>".
-											"<td>".$categoryName."</td>".
-											"<td>".$modelMappingRecord->keyProductID."</td>".
-											"<td>".$productCode."</td>".
-											"<td>".$productName."</td>".
-											"<td>".$modelMappingRecord->quantity."</td>".
+											"<td>".$productRecord->keyProductID."</td>".
+											"<td>".$productRecord->productCode."</td>".
+											"<td>".$productRecord->name."</td>".
+											"<td>".$productRecord->description1."</td>".
 										"</tr>";
-										
-										//check if the model contains any attributes
-										if(sizeof($modelMappingRecord->attributes) > 0)
-										{
-											//output attributes
-											$resultMessage = $resultMessage."<tr>".
-												"<th>Attributes</th>".
-												"<th>Profile</th>".
-												"<th>Name</th>".
-												"<th>Value</th>".
-											"</tr>";
-											
-											//output each attribute value assigned to the model mapping
-											foreach ($modelMappingRecord->attributes as $attributeValueRecord)
-											{											
-												//check that the attribute has been obtained
-												if(array_key_exists($attributeValueRecord->keyAttributeID, $attributesRecordIndex)){
-												
-													$attributeRecord = $attributesRecordIndex[$attributeValueRecord->keyAttributeID];
-													$attributeName = $attributeRecord->name;
-													$attributeDataType = $attributeRecord->dataType;
-													$attributeProfileName = "";
-													$attributeValue = "";
-													
-													if(array_key_exists($attributeValueRecord->keyAttributeProfileID, $attributeProfilesRecordIndex)){
-														$attributeProfileName = $attributeProfilesRecordIndex[$attributeValueRecord->keyAttributeProfileID]->name;
-													}
-													
-													// get the model mapping's attribute value based on its data type
-													if($attributeDataType == ESDRecordAttribute::DATA_TYPE_NUMBER){
-														$attributeValue = $attributeValueRecord->numberValue;
-													}else{
-														$attributeValue = $attributeValueRecord->stringValue;
-													}
-													
-													$resultMessage = $resultMessage."<tr>".
-														"<td></td>".
-														"<td>$attributeProfileName</td>".
-														"<td>$attributeName</td>".
-														"<td>$attributeValue</td>".
-													"</tr>";
-												}
-											}
-										}
 										
 										$recordNumber++;
 									}
@@ -436,7 +170,7 @@
 								}
 							}else{
 								$result = "FAIL";
-								$resultMessage = "Organisation Make Model Mapping data failed to be obtained from the platform. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
+								$resultMessage = "Organisation Product data failed to be obtained from the platform. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
 							}
 						}
 					}

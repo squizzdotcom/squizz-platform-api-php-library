@@ -90,7 +90,12 @@
 		/**
 		* name of the platform's API endpoint to call to send a customer invoice from a supplier organisation to a customer organisation
 		*/
-        const API_ORG_ENDPOINT_SEND_CUSTOMER_INVOICE_TO_CUSTOMER = "send_customer_invoice_to_customer";
+		const API_ORG_ENDPOINT_SEND_CUSTOMER_INVOICE_TO_CUSTOMER = "send_customer_invoice_to_customer";
+		
+		/**
+		* name of the platform's API endpoint to call to send a delivery from a supplier organisation to a customer organisation or person
+		*/
+        const API_ORG_ENDPOINT_SEND_DELIVERY_NOTICE_TO_CUSTOMER = "send_delivery_notice_to_customer";
 		
 		/**
 		* name of the endpoint attribute in the API endpoint response that contains the result code

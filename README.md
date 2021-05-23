@@ -28,6 +28,7 @@ If you are a software developer writing a PHP application then we recommend that
     * [Retrieve Customer Account Record Endpoint](#retrieve-customer-account-record-endpoint)
     * [Send and Procure Purchase Order From Supplier Endpoint](#send-and-procure-purchase-order-from-supplier-endpoint)
     * [Send Customer Invoice To Customer Endpoint](#send-customer-invoice-to-customer-endpoint)
+	* [Send Delivery Notice to Customer Endpoint](#send-delivery-notice-to-customer-endpoint)
     * [Create Organisation Notification Endpoint](#create-organisation-notification-endpoint)
     * [Import Organisation Data Endpoint](#import-organisation-data-endpoint)
     * [Import Organisation Sales Order Endpoint](#import-organisation-sales-order-endpoint)
@@ -1859,6 +1860,162 @@ See the example below on how the call the Send Customer Invoice To Customer endp
 		echo "<div>Message:<div>";
 		echo "<div><b>$resultMessage</b><div><br/>";
 	?>
+```
+
+### Send Delivery Notice to Customer Endpoint
+
+The SQUIZZ.com platform's API has an endpoint that allows an orgnisation to send delivery notices (also known as shipping notices, freight notices, advanced shipping notices) for goods it having delivered to a customer, notifying where the ordered goods are being handled in the dispatch and delivery/shipping process. 
+This endpoint allows a supplier organisation to automate the sending out of delivery notices to its customers, allowing either individuals ordering in squizz to receive these notices, as well as allow customer organisations to automate the receiving of delivery notices and importing them back into their own systems.
+Many delivery notices may be sent for the same delivery of ordered goods, containing a status and message outlining where the goods are currently located. This can allow customers to receive many notifications as it progresses. It's up to you to determine how often the customer should be aware of delivery progression.
+- The endpoint relies upon a supplier organisations first importing customer accounts within the SQUIZZ.com platform that the delivery notices are associated to.
+- If the delivery notices needs to be forwarded onto customer organisations, then endpoint either relies upon a connection first being setup between the supplier and customer organisations within the SQUIZZ.com platform, or the supplying organisation setting up a data adaptor to export the customer delivery notices to the customers external system. The first option is preferred since the supplying org then doesn't need to know what system the customer organisation is running.
+- The endpoint has a number of other requirements. See the endpoint documentation for more details on these requirements.
+
+Each delivery notice needs to be imported within a "Ecommerce Standards Document" that contains a record for each delivery notice. Use the Ecommerce Standards library to easily create these documents and records.
+It is recommended to only import one delivery notice at a time, since if an array of delivery notice is imported and one notice failed to import, then no other notices in the list will be attempted to import.
+Read [https://www.squizz.com/docs/squizz/Platform-API.html#section1550](https://www.squizz.com/docs/squizz/Platform-API.html#section1550) for more documentation about the endpoint and its requirements.
+See the example below on how the call the Send Delivery Notice To Customer endpoint. Note that a session must first be created in the API before calling the endpoint.
+
+```php
+<?php
+    require_once __DIR__ . '/../../../../../3rd-party/jsonmapper/JsonMapper/Exception.php';
+    
+    //set automatic loader of the library's classes
+    spl_autoload_register(function($className) {
+        $className = ltrim($className, '\\');
+        $fileName  = '';
+        $namespace = '';
+        if ($lastNsPos = strripos($className, '\\')) {
+            $namespace = substr($className, 0, $lastNsPos);
+            $className = substr($className, $lastNsPos + 1);
+            $fileName  = str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . DIRECTORY_SEPARATOR;
+        }
+        $fileName .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
+        
+        $apiNamespace = "squizz\\api\\v1";
+        $esdNamespace = "EcommerceStandardsDocuments";
+        $esdInstallPath = "/opt/squizz/esd-php-library/src/";
+        
+        //set absolute path to API php class files
+        if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
+            $fileName = $_SERVER['DOCUMENT_ROOT']. '/src/' . $fileName;
+        }
+        //set absolute path to ESD library files
+        else if(substr($namespace, 0, strlen($esdNamespace)) === $esdNamespace){
+            $fileName = $esdInstallPath . $fileName;
+        }
+        
+        require $fileName;
+    });
+    
+    use squizz\api\v1\endpoint\APIv1EndpointResponse;
+    use squizz\api\v1\endpoint\APIv1EndpointResponseESD;
+    use squizz\api\v1\endpoint\APIv1EndpointOrgSendDeliveryNoticeToCustomer;
+    use squizz\api\v1\APIv1OrgSession;
+    use squizz\api\v1\APIv1Constants;
+    use EcommerceStandardsDocuments\ESDRecordDeliveryNotice;
+    use EcommerceStandardsDocuments\ESDocumentConstants;
+    use EcommerceStandardsDocuments\ESDocumentDeliveryNotice;
+    
+    //obtain or load in an organisation's API credentials, in this example from command line arguments
+    $orgID = $_GET["orgID"];
+    $orgAPIKey = $_GET["orgAPIKey"];
+    $orgAPIPass = $_GET["orgAPIPass"];
+    $customerOrgID = $_GET["customerOrgID"];
+    $supplierAccountCode = $_GET["supplierAccountCode"];
+    $useDeliveryNoticeExport = ($_GET["useDeliveryNoticeExport"] == ESDocumentConstants::ESD_VALUE_YES? true: false);
+    
+    $sessionTimeoutMilliseconds = 60000;
+    
+    echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
+    
+    //create an API session instance
+    $apiOrgSession = new APIv1OrgSession($orgID, $orgAPIKey, $orgAPIPass, $sessionTimeoutMilliseconds, APIv1Constants::SUPPORTED_LOCALES_EN_AU);
+    
+    //call the platform's API to request that a session is created
+    $endpointResponse = $apiOrgSession->createOrgSession();
+    
+    //check if the organisation's credentials were correct and that a session was created in the platform's API
+    $result = "FAIL";
+    $resultMessage = "";
+    if($endpointResponse->result != APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS)
+    {
+        //session failed to be created
+        $resultMessage = "API session failed to be created. Reason: " . $endpointResponse->result_message  . " Error Code: " . $endpointResponse->result_code;
+    }
+    
+    //send the delivery notice if the API was successfully created
+    if($apiOrgSession->sessionExists())
+    {
+        //create customer invoice record to import
+        $deliveryNoticeRecord = new ESDRecordDeliveryNotice();
+
+        //set data within the delivery notice
+        $deliveryNoticeRecord->keyDeliveryNoticeID = "DN123";
+        $deliveryNoticeRecord->deliveryNoticeCode = "CUSDELNUM-123-A";
+        $deliveryNoticeRecord->deliveryStatus = ESDocumentConstants::DELIVERY_STATUS_IN_TRANSIT;
+        $deliveryNoticeRecord->deliveryStatusMessage = "Currently en-route to receiver.";
+
+        //set information about the freight carrier currently performing the delivery
+        $deliveryNoticeRecord->freightCarrierName = "ACME Freight Logistics Inc.";
+        $deliveryNoticeRecord->freightCarrierCode = "ACFLI";
+        $deliveryNoticeRecord->freightCarrierTrackingCode = "34320-ACFLI-34324-234";
+        $deliveryNoticeRecord->freightCarrierAccountCode = "VIP00012";
+        $deliveryNoticeRecord->freightCarrierConsignCode = "42343-242344";
+        $deliveryNoticeRecord->freightCarrierServiceCode = "SUPER-SMART-FREIGHT-FACILITATOR";
+        $deliveryNoticeRecord->freightSystemRefCode = "SSFF-3421";
+
+        // add references to other records (sales order, customer invoice, purchase order, customer account) that this delivery is associated to
+        $deliveryNoticeRecord->keyCustomerInvoiceID = "4";
+        $deliveryNoticeRecord->customerInvoiceCode = "CINV-22";
+        $deliveryNoticeRecord->customerInvoiceNumber = "22";
+        $deliveryNoticeRecord->keySalesOrderID = "121-332";
+        $deliveryNoticeRecord->salesOrderCode = "SSO-332-ABC";
+        $deliveryNoticeRecord->salesOrderNumber = "332";
+        $deliveryNoticeRecord->purchaseOrderCode = "PO-345";
+        $deliveryNoticeRecord->purchaseOrderNumber = "345";
+        $deliveryNoticeRecord->instructions = "Please leave goods via the back driveway";
+        $deliveryNoticeRecord->keyCustomerAccountID = "1";
+
+        // set where the delivery is currently located geographically
+        $deliveryNoticeRecord->atGeographicLocation = ESDocumentConstants::ESD_VALUE_YES;
+        $deliveryNoticeRecord->locationLatitude = -37.8277324706811;
+        $deliveryNoticeRecord->locationLongitude = 144.92382897158126;
+
+        //create delivery notice records list and add delivery notice to it
+        $deliveryNoticeRecords = array();
+        array_push($deliveryNoticeRecords, $deliveryNoticeRecord);
+        
+        //after 60 seconds give up on waiting for a response from the API when sending the delivery notice
+        $timeoutMilliseconds = 60000;
+        
+        //create delivery notice Ecommerce Standards document and add delivery notice records to the document
+        $deliveryNoticeESD = new ESDocumentDeliveryNotice(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $deliveryNoticeRecords, array());
+
+        //send delivery notice document to the API for sending onto the customer organisation
+        $endpointResponseESD = APIv1EndpointOrgSendDeliveryNoticeToCustomer::call($apiOrgSession, $timeoutMilliseconds, $customerOrgID, $supplierAccountCode, $useDeliveryNoticeExport, $deliveryNoticeESD);
+        
+        //check the result of sending the delivery notice
+        if($endpointResponseESD->result == APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS){
+            $result = "SUCCESS";
+            $resultMessage = "Organisation delivery notice(s) have successfully been sent to customer.";
+            
+        }else{
+            $result = "FAIL";
+            $resultMessage = "Organisation delivery notice failed to be processed. Reason: " . $endpointResponseESD->result_message . " Error Code: " . $endpointResponseESD->result_code . "<br/>";
+        }
+    }
+    
+    //next steps
+    //call other API endpoints...
+    //destroy API session when done...
+    $apiOrgSession->destroyOrgSession();
+    
+    echo "<div>Result:<div>";
+    echo "<div><b>$result</b><div><br/>";
+    echo "<div>Message:<div>";
+    echo "<div><b>$resultMessage</b><div><br/>";
+?>
 ```
 
 ### Create Organisation Notification Endpoint
