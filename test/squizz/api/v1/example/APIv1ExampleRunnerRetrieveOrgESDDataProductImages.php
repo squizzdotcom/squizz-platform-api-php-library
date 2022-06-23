@@ -209,7 +209,7 @@
 											//output details of the record
 											$resultMessage = $resultMessage."<tr>".
 												"<td>".$recordNumber."</td>".
-												"<td>".$imageRecord->keyProductID."</td>".
+												"<td>".htmlentities($imageRecord->keyProductID)."</td>".
 												"<td>".htmlentities($productCode)."</td>".
 												'<td><a href="'.$imageURLStartingPath.$imageRecord->imageFullFilePath.'" target="_blank">View Image</a></td>'.
 												"<td>".htmlentities($imageRecord->keyImageID)."</td>".
