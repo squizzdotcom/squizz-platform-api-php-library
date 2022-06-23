@@ -1,6 +1,6 @@
 <?php
 	/**
-	* Copyright (C) 2019 Squizz PTY LTD
+	* Copyright (C) Squizz PTY LTD
 	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -23,6 +23,7 @@
 	use EcommerceStandardsDocuments\ESDocumentMaker;
 	use EcommerceStandardsDocuments\ESDocumentMakerModel;
 	use EcommerceStandardsDocuments\ESDocumentMakerModelMapping;
+	use EcommerceStandardsDocuments\ESDocumentImage;
 	use \JsonMapper;
 
 	/**
@@ -35,6 +36,7 @@
 		const RETRIEVE_TYPE_ID_CATEGORIES = 8;
 		const RETRIEVE_TYPE_ID_PRICING = 37;
 		const RETRIEVE_TYPE_ID_PRODUCT_STOCK = 10;
+		const RETRIEVE_TYPE_ID_PRODUCT_IMAGE = 12;
 		const RETRIEVE_TYPE_ID_ATTRIBUTES = 11;
 		const RETRIEVE_TYPE_ID_MAKERS = 44;
 		const RETRIEVE_TYPE_ID_MAKER_MODELS = 45;
@@ -72,6 +74,9 @@
 						break;
 					case self::RETRIEVE_TYPE_ID_PRODUCT_STOCK:
 						$deserializeESDDocument = new ESDocumentStockQuantity();
+						break;
+					case self::RETRIEVE_TYPE_ID_PRODUCT_IMAGE:
+						$deserializeESDDocument = new ESDocumentImage();
 						break;
 					case self::RETRIEVE_TYPE_ID_CATEGORIES:
 						$deserializeESDDocument = new ESDocumentCategory();

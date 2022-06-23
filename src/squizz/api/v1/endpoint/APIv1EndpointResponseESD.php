@@ -24,6 +24,7 @@
 		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_SURCHARGES = "invoices_with_unmapped_surcharges";
 		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_LINE_TAXCODES = "invoices_with_unmapped_line_taxcodes";
 		const ESD_CONFIG_INVOICES_WITH_UNMAPPED_SURCHARGE_TAXCODES = "invoices_with_unmapped_surcharge_taxcodes";
+		const ESD_CONFIG_IMAGE_STARTING_FILE_PATH = "image_starting_file_path";
 		
 		//set default values for the response
 		public $result = APIv1EndpointResponse::ENDPOINT_RESULT_FAILURE;

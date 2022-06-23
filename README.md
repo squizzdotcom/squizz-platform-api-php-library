@@ -133,7 +133,7 @@ Read [https://www.squizz.com/docs/squizz/Platform-API.html#section840](https://w
 
 ### Retrieve Organisation Data Endpoint
 The SQUIZZ.com platform's API has an endpoint that allows a variety of different types of data to be retrieved from another organisation stored on the platform.
-The organisational data that can be retrieved includes products, product stock quantities, product pricing, product attributes, categories, make/model data and more.
+The organisational data that can be retrieved includes products, product stock quantities, product pricing, product attributes, product images, categories, make/model data and more.
 The data retrieved can be used to allow an organisation to set additional information about products being bought or sold, as well as being used in many other ways.
 Each kind of data retrieved from endpoint is formatted as JSON data conforming to the "Ecommerce Standards Document" standards, with each document containing an array of zero or more records. Use the Ecommerce Standards library to easily read through these documents and records, to find data natively using PHP classes.
 The SQUIZZ.com platform API returns collections of records enclosed in an Ecommerce Standards Document. The number of records returned with each request is limited, and may require multiple requests to build a full record set. See example files on how this is done using pagination request parameters.
@@ -146,6 +146,8 @@ Other examples exist in this repository's examples folder on how to retrieve ser
  - Retrieve Makers [APIv1ExampleRunnerRetrieveOrgESDDataMakers.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataMakers.php)
  - Retrieve Maker Models [APIv1ExampleRunnerRetrieveOrgESDDataMakerModels.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataMakerModels.php)
  - Retrieve Maker Model Mappings [APIv1ExampleRunnerRetrieveOrgESDDataMakerModelMappings.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataMakerModelMappings.php)
+ - Retrieve Products [APIv1ExampleRunnerRetrieveOrgESDDataProducts.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProducts.php)
+ - Retrieve Product Images [APIv1ExampleRunnerRetrieveOrgESDDataProductImages.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProductImages.php)
 
 ```php
 <?php
