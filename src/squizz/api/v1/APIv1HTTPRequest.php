@@ -1,6 +1,6 @@
 <?php
 	/**
-	* Copyright (C) 2017 Squizz PTY LTD
+	* Copyright (C) Squizz PTY LTD
 	* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 	* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 	* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -195,14 +195,11 @@
 					
 					//get the message that corresponds with the result code
 					if(array_key_exists($endpointResponse->result_code, $langBundle->lang)){
-						
 						$endpointResponse->result_message = $langBundle->getString($endpointResponse->result_code);
 					}
 					
 					//get result status and result code from document
 					if($endpointResponse->esDocument != null){
-					
-						
 						//get the result status from the esDocument
 						if($endpointResponse->esDocument->resultStatus == ESDocumentConstants::RESULT_SUCCESS){
 							$endpointResponse->result = APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS;
@@ -219,8 +216,8 @@
 					}
 					
 					//get the message that corresponds with the result code
-					if(array_key_exists($endpointResponse->result_code, $langBundle)){
-						$endpointResponse->result_message = $langBundle[$endpointResponse->result_code];
+					if(array_key_exists($endpointResponse->result_code, $langBundle->lang)){
+						$endpointResponse->result_message = $langBundle->getString($endpointResponse->result_code);
 					}
 				}else{
 					$endpointResponse->result = APIv1EndpointResponse::ENDPOINT_RESULT_FAILURE;
