@@ -19,6 +19,7 @@
 	use EcommerceStandardsDocuments\ESDocumentPrice;
 	use EcommerceStandardsDocuments\ESDocumentStockQuantity;
 	use EcommerceStandardsDocuments\ESDocumentCategory;
+	use EcommerceStandardsDocuments\ESDocumentProductCombination;
 	use EcommerceStandardsDocuments\ESDocumentAttribute;
 	use EcommerceStandardsDocuments\ESDocumentMaker;
 	use EcommerceStandardsDocuments\ESDocumentMakerModel;
@@ -34,6 +35,7 @@
 	{
 		const RETRIEVE_TYPE_ID_PRODUCTS = 3;
 		const RETRIEVE_TYPE_ID_CATEGORIES = 8;
+		const RETRIEVE_TYPE_ID_PRODUCT_COMBINATIONS = 15;
 		const RETRIEVE_TYPE_ID_PRICING = 37;
 		const RETRIEVE_TYPE_ID_PRODUCT_STOCK = 10;
 		const RETRIEVE_TYPE_ID_PRODUCT_IMAGE = 12;
@@ -81,6 +83,9 @@
 					case self::RETRIEVE_TYPE_ID_CATEGORIES:
 						$deserializeESDDocument = new ESDocumentCategory();
 						break;
+					case self::RETRIEVE_TYPE_ID_PRODUCT_COMBINATIONS:
+						$deserializeESDDocument = new ESDocumentProductCombination();
+						break;
 					case self::RETRIEVE_TYPE_ID_ATTRIBUTES:
 						$deserializeESDDocument = new ESDocumentAttribute();
 						break;
@@ -120,7 +125,7 @@
 				
 					$endpointResponse = APIv1HTTPRequest::sendESDocumentHTTPRequest(APIv1Constants::HTTP_REQUEST_METHOD_GET, APIv1Constants::API_ORG_ENDPOINT_RETRIEVE_ESD . APIv1Constants::API_PATH_SLASH . $apiOrgSession->getSessionID(), $endpointParams, $requestHeaders, "", null, $endpointTimeoutMilliseconds, $apiOrgSession->getLangBundle(), $endpointJSONReader, $endpointResponse);
 					
-					//check that the data was successfully pushed up
+					//check that the data was successfully retrieved
 					if(strcasecmp($endpointResponse->result, APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS) != 0)
 					{
 						//check if the session still exists
