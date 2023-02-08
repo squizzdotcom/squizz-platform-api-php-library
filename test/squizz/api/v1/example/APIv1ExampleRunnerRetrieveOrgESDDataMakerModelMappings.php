@@ -27,7 +27,7 @@
 			<div style="max-width: 607px; background-color: #2b2b2b; color: #cacaca; text-align: center; margin: auto; padding-top: 15px;">
 				<?php
 					/**
-					* Copyright (C) 2019 Squizz PTY LTD
+					* Copyright (C) Squizz PTY LTD
 					* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 					* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 					* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -97,7 +97,11 @@
 					$attributesRecordIndex = array();
 					$productsRecordIndex = array();
 					$categoriesRecordIndex = array();
-					
+					$recordsUpdatedAfterDateTimeMilliseconds = APIv1EndpointOrgRetrieveESDocument::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS;
+
+					//to limit only retrieving records updated after a specific date time then uncomment this line and set date
+					//$filterRecordsAfterDateTime = new DateTimeImmutable("2023-02-07 02:58:58", new DateTimeZone("Australia/Melbourne"));
+					//$recordsUpdatedAfterDateTimeMilliseconds = $filterRecordsAfterDateTime->getTimestamp() * 1000;
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
 					
@@ -129,7 +133,7 @@
 						while($getMoreRecords)
 						{
 							//call the platform's API to retrieve the organisation's maker model data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_MAKER_MODELS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
+							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_MAKER_MODELS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds);
 							
 							$getMoreRecords = false;
 							$esDocument = $endpointResponseESD->esDocument;
@@ -173,7 +177,7 @@
 						$timeoutMilliseconds = 120000;
 						
 						//call the platform's API to retrieve the organisation's attribute data
-						$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_ATTRIBUTES, $supplierOrgID, '', 5000, 0);
+						$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_ATTRIBUTES, $supplierOrgID, '', 5000, 0, $recordsUpdatedAfterDateTimeMilliseconds);
 						$getMoreRecords = false;
 						$esDocument = $endpointResponseESD->esDocument;
 			
@@ -215,7 +219,7 @@
 						while($getMoreRecords)
 						{
 							//call the platform's API to retrieve the organisation's product data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCTS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
+							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCTS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds);
 							$getMoreRecords = false;
 							$esDocument = $endpointResponseESD->esDocument;
 				
@@ -262,7 +266,7 @@
 						while($getMoreRecords)
 						{
 							//call the platform's API to retrieve the organisation's category data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_CATEGORIES, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
+							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_CATEGORIES, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds);
 							$getMoreRecords = false;
 							$esDocument = $endpointResponseESD->esDocument;
 							
@@ -309,7 +313,7 @@
 						while($getMoreRecords)
 						{
 							//call the platform's API to retrieve the organisation's maker model mapping data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_MAKER_MODEL_MAPPINGS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
+							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_MAKER_MODEL_MAPPINGS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds);
 							$getMoreRecords = false;
 							$esDocument = $endpointResponseESD->esDocument;
 				

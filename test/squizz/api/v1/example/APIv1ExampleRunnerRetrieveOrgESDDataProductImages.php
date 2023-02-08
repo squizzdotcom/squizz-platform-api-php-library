@@ -85,6 +85,11 @@
 					$recordNumber = 1;
 					$resultMessage = "";
 					$productsRecordIndex = array();
+					$recordsUpdatedAfterDateTimeMilliseconds = APIv1EndpointOrgRetrieveESDocument::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS;
+
+					//to limit only retrieving records updated after a specific date time then uncomment this line and set date
+					//$filterRecordsAfterDateTime = new DateTimeImmutable("2023-02-07 02:58:58", new DateTimeZone("Australia/Melbourne"));
+					//$recordsUpdatedAfterDateTimeMilliseconds = $filterRecordsAfterDateTime->getTimestamp() * 1000;
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
 					
@@ -120,7 +125,7 @@
 						while($getMoreRecords)
 						{
 							//call the platform's API to retrieve the organisation's product data
-							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCTS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
+							$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCTS, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds);
 							$getMoreRecords = false;
 							$esDocument = $endpointResponseESD->esDocument;
 				
@@ -166,7 +171,7 @@
 							while($getMoreRecords)
 							{
 								//call the platform's API to retrieve the organisation's product image data
-								$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCT_IMAGE, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex);
+								$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRODUCT_IMAGE, $supplierOrgID, '',$recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds);
 								$getMoreRecords = false;
 								$esDocument = $endpointResponseESD->esDocument;
 					

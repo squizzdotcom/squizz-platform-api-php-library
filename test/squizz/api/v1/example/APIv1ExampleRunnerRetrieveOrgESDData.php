@@ -78,6 +78,11 @@
 					$sessionTimeoutMilliseconds = 60000;
 					$recordsMaxAmount = 5000;
 					$recordsStartIndex = 0;
+					$recordsUpdatedAfterDateTimeMilliseconds = APIv1EndpointOrgRetrieveESDocument::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS;
+
+					//to limit only retrieving records updated after a specific date time then uncomment this line and set date
+					//$filterRecordsAfterDateTime = new DateTimeImmutable("2023-02-07 02:58:58", new DateTimeZone("Australia/Melbourne"));
+					//$recordsUpdatedAfterDateTimeMilliseconds = $filterRecordsAfterDateTime->getTimestamp() * 1000;
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
 					
@@ -106,7 +111,7 @@
 						$timeoutMilliseconds = 120000;
 						
 						//call the platform's API to retrieve the organisation's data
-						$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex);
+						$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds);
 						
 						$esDocument = $endpointResponseESD->esDocument;
 			
