@@ -61,7 +61,7 @@
 		* @param recordsUpdatedAfterDateTimeMilliseconds optionally limit to only retrieving records that were updated after the given date time. Provide date time in milliseconds since the 01-01-1970 12am UTC epoch, else set to 0 to obtain all records
 		* @return APIv1EndpointResponseESD response from calling the API endpoint
 		*/
-		public static function call($apiOrgSession, $endpointTRETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDSimeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds = self::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS)
+		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds = self::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS)
 		{
 			$requestHeaders = array();
 			$endpointResponse = new APIv1EndpointResponseESD();
