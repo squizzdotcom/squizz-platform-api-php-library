@@ -66,6 +66,7 @@
 					use squizz\api\v1\endpoint\APIv1EndpointOrgRetrieveESDocument;
 					use squizz\api\v1\APIv1OrgSession;
 					use squizz\api\v1\APIv1Constants;
+					use squizz\api\v1\APIv1Util;
 					use EcommerceStandardsDocuments\ESDocumentConstants;
 					use EcommerceStandardsDocuments\ESDRecordProduct;
 					use EcommerceStandardsDocuments\ESDRecordCategory;
@@ -248,10 +249,10 @@
 								"<td>".htmlentities($categoryRecord->name)."</td>".
 								"<td>".htmlentities($categoryRecord->KeyCategoryParentID)."</td>".
 								"<td>".htmlentities($parentCategoryCode)."</td>".
-								"<td>".htmlentities($categoryRecord->description1)."</td>".
-								"<td>".htmlentities($categoryRecord->description2)."</td>".
-								"<td>".htmlentities($categoryRecord->description3)."</td>".
-								"<td>".htmlentities($categoryRecord->description4)."</td>".
+								"<td>".APIv1Util::markupTextToHTML(htmlentities($categoryRecord->description1))."</td>".
+								"<td>".APIv1Util::markupTextToHTML(htmlentities($categoryRecord->description2))."</td>".
+								"<td>".APIv1Util::markupTextToHTML(htmlentities($categoryRecord->description3))."</td>".
+								"<td>".APIv1Util::markupTextToHTML(htmlentities($categoryRecord->description4))."</td>".
 								"<td>".htmlentities($categoryRecord->metaTitle)."</td>".
 								"<td>".htmlentities($categoryRecord->metaKeywords)."</td>".
 								"<td>".htmlentities($categoryRecord->metaDescription)."</td>".

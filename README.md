@@ -185,6 +185,7 @@ Other examples exist in this repository's examples folder on how to retrieve ser
 	use squizz\api\v1\endpoint\APIv1EndpointOrgRetrieveESDocument;
 	use squizz\api\v1\APIv1OrgSession;
 	use squizz\api\v1\APIv1Constants;
+	use squizz\api\v1\APIv1Util;
 	use EcommerceStandardsDocuments\ESDRecordOrderPurchase;
 	use EcommerceStandardsDocuments\ESDRecordOrderPurchaseLine;
 	use EcommerceStandardsDocuments\ESDocumentConstants;
@@ -258,6 +259,7 @@ Other examples exist in this repository's examples folder on how to retrieve ser
 									"<th>Product Code</th>".
 									"<th>Barcode</th>".
 									"<th>Name</th>".
+									"<th>Description 1</th>".
 									"<th>Key Taxcode ID</th>".
 									"<th>Stock Available</th>".
 								"</tr>";
@@ -270,11 +272,12 @@ Other examples exist in this repository's examples folder on how to retrieve ser
 							//output details of the price record
 							$resultMessage = $resultMessage."<tr>".
 								"<td>".$recordNumber."</td>".
-								"<td>".$productRecord->keyProductID."</td>".
-								"<td>".$productRecord->productCode."</td>".
-								"<td>".$productRecord->barcode."</td>".
-								"<td>".$productRecord->name."</td>".
-								"<td>".$productRecord->keyTaxcodeID."</td>".
+								"<td>".htmlentities($productRecord->keyProductID)."</td>".
+								"<td>".htmlentities($productRecord->productCode)."</td>".
+								"<td>".htmlentities($productRecord->barcode)."</td>".
+								"<td>".htmlentities($productRecord->name)."</td>".
+								"<td>".APIv1Util::markupTextToHTML(htmlentities($productRecord->description1))."</td>".
+								"<td>".htmlentities($productRecord->keyTaxcodeID)."</td>".
 								"<td>".$productRecord->stockQuantity."</td>".
 							"</tr>";
 							
@@ -305,8 +308,8 @@ Other examples exist in this repository's examples folder on how to retrieve ser
 							//output details of the price record
 							$resultMessage = $resultMessage."<tr>".
 								"<td>".$recordNumber."</td>".
-								"<td>".$priceRecord->keyProductID."</td>".
-								"<td>".$priceRecord->keySellUnitID."</td>".
+								"<td>".htmlentities($priceRecord->keyProductID)."</td>".
+								"<td>".htmlentities($priceRecord->keySellUnitID)."</td>".
 								"<td>".$priceRecord->quantity."</td>".
 								"<td>".$priceRecord->taxRate."</td>".
 								"<td>".money_format ('%.2n', $priceRecord->price)."</td>".
@@ -337,7 +340,7 @@ Other examples exist in this repository's examples folder on how to retrieve ser
 							//output details of the price record
 							$resultMessage = $resultMessage."<tr>".
 								"<td>".$recordNumber."</td>".
-								"<td>".$stockRecord->keyProductID."</td>".
+								"<td>".htmlentities($stockRecord->keyProductID)."</td>".
 								"<td>".$stockRecord->qtyAvailable."</td>".
 								"<td>".$stockRecord->qtyOrderable."</td>".
 							"</tr>";

@@ -146,11 +146,11 @@
 											//output details of the price record
 											$resultMessage = $resultMessage."<tr>".
 												"<td>".$recordNumber."</td>".
-												"<td>".$productRecord->keyProductID."</td>".
-												"<td>".$productRecord->productCode."</td>".
-												"<td>".$productRecord->barcode."</td>".
-												"<td>".$productRecord->name."</td>".
-												"<td>".$productRecord->keyTaxcodeID."</td>".
+												"<td>".htmlentities($productRecord->keyProductID)."</td>".
+												"<td>".htmlentities($productRecord->productCode)."</td>".
+												"<td>".htmlentities($productRecord->barcode)."</td>".
+												"<td>".htmlentities($productRecord->name)."</td>".
+												"<td>".htmlentities($productRecord->keyTaxcodeID)."</td>".
 												"<td>".$productRecord->stockQuantity."</td>".
 											"</tr>";
 											
@@ -181,8 +181,8 @@
 											//output details of the price record
 											$resultMessage = $resultMessage."<tr>".
 												"<td>".$recordNumber."</td>".
-												"<td>".$priceRecord->keyProductID."</td>".
-												"<td>".$priceRecord->keySellUnitID."</td>".
+												"<td>".htmlentities($priceRecord->keyProductID)."</td>".
+												"<td>".htmlentities($priceRecord->keySellUnitID)."</td>".
 												"<td>".$priceRecord->quantity."</td>".
 												"<td>".$priceRecord->taxRate."</td>".
 												"<td>".money_format ('%.2n', $priceRecord->price)."</td>".
@@ -213,7 +213,7 @@
 											//output details of the price record
 											$resultMessage = $resultMessage."<tr>".
 												"<td>".$recordNumber."</td>".
-												"<td>".$stockRecord->keyProductID."</td>".
+												"<td>".htmlentities($stockRecord->keyProductID)."</td>".
 												"<td>".$stockRecord->qtyAvailable."</td>".
 												"<td>".$stockRecord->qtyOrderable."</td>".
 											"</tr>";

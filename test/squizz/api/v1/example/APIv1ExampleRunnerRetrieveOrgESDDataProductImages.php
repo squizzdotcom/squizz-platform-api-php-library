@@ -66,6 +66,7 @@
 					use squizz\api\v1\endpoint\APIv1EndpointOrgRetrieveESDocument;
 					use squizz\api\v1\APIv1OrgSession;
 					use squizz\api\v1\APIv1Constants;
+					use squizz\api\v1\APIv1Util;
 					use EcommerceStandardsDocuments\ESDocumentConstants;
 					use EcommerceStandardsDocuments\ESDocument;
 					use EcommerceStandardsDocuments\ESDRecordProduct;
@@ -219,7 +220,7 @@
 												'<td><a href="'.$imageURLStartingPath.$imageRecord->imageFullFilePath.'" target="_blank">View Image</a></td>'.
 												"<td>".htmlentities($imageRecord->keyImageID)."</td>".
 												"<td>".htmlentities($imageRecord->title)."</td>".
-												"<td>".htmlentities($imageRecord->description)."</td>".
+												"<td>".APIv1Util::markupTextToHTML(htmlentities($imageRecord->description))."</td>".
 											"</tr>";
 											
 											$recordNumber++;

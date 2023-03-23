@@ -66,6 +66,7 @@
 					use squizz\api\v1\endpoint\APIv1EndpointOrgRetrieveESDocument;
 					use squizz\api\v1\APIv1OrgSession;
 					use squizz\api\v1\APIv1Constants;
+					use squizz\api\v1\APIv1Util;
 					use EcommerceStandardsDocuments\ESDocumentConstants;
 					use EcommerceStandardsDocuments\ESDocument;
 					use EcommerceStandardsDocuments\ESDRecordProduct;
@@ -153,10 +154,10 @@
 										//output details of the record
 										$resultMessage = $resultMessage."<tr>".
 											"<td>".$recordNumber."</td>".
-											"<td>".$productRecord->keyProductID."</td>".
-											"<td>".$productRecord->productCode."</td>".
-											"<td>".$productRecord->name."</td>".
-											"<td>".$productRecord->description1."</td>".
+											"<td>".htmlentities($productRecord->keyProductID)."</td>".
+											"<td>".htmlentities($productRecord->productCode)."</td>".
+											"<td>".htmlentities($productRecord->name)."</td>".
+											"<td>".APIv1Util::markupTextToHTML(htmlentities($productRecord->description1))."</td>".
 										"</tr>";
 										
 										$recordNumber++;
