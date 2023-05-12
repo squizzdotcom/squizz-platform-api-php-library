@@ -227,6 +227,7 @@
 									"<th>Key Category Tree ID</th>".
 									"<th>Category Tree Code</th>".
 									"<th>Name</th>".
+									"<th>Description</th>".
 									"<th>Ordering</th>".
 								"</tr>";
 
