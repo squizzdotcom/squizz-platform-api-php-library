@@ -47,7 +47,7 @@
 						
 						$apiNamespace = "squizz\\api\\v1";
 						$esdNamespace = "EcommerceStandardsDocuments";
-						$esdInstallPath = "/opt/squizz/esd-php-library/src/";
+						$esdInstallPath = "/path/to/esd-php-library/src/";
 						
 						//set absolute path to API php class files
 						if(substr($namespace, 0, strlen($apiNamespace)) === $apiNamespace){
@@ -82,10 +82,12 @@
 					$recordsMaxAmount = 5000;
 					$recordsStartIndex = 0;
 					$getMoreRecords = true;
+					$categoryTreeRecordNumber = 1;
 					$recordNumber = 1;
 					$resultMessage = "";
 					$productsRecordIndex = array();
 					$categoriesRecordIndex = array();
+					$categoryTreesRecordIndex = array();
 					$recordsUpdatedAfterDateTimeMilliseconds = APIv1EndpointOrgRetrieveESDocument::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS;
 
 					//to limit only retrieving records updated after a specific date time then uncomment this line and set date
@@ -186,6 +188,13 @@
 									foreach ($esDocument->dataRecords as $categoryRecord){
 										$categoriesRecordIndex[$categoryRecord->keyCategoryID] = $categoryRecord;
 									}
+
+									//get category tree records from the first page of data
+									if($recordsStartIndex == 0 && $esDocument->categoryTreeRecords != null){
+										foreach ($esDocument->categoryTreeRecords as $categoryTreeRecord){
+											$categoryTreesRecordIndex[$categoryTreeRecord->keyCategoryTreeID] = $categoryTreeRecord;
+										}
+									}
 									
 									//check if there are more records to retrieve
 									if(sizeof($esDocument->dataRecords) >= $recordsMaxAmount)
@@ -211,7 +220,38 @@
 						//output table headers
 						$resultMessage = $resultMessage.
 							"Organisation data successfully obtained from the platform".
-							"<br/>Category Records:".
+							"<br/>Category Tree Records:".
+							'<table style="width: 100%; display: block; overflow-x: auto;white-space: nowrap;">'.
+								"<tr>".
+									"<th>#</th>".
+									"<th>Key Category Tree ID</th>".
+									"<th>Category Tree Code</th>".
+									"<th>Name</th>".
+									"<th>Ordering</th>".
+								"</tr>";
+
+						//iterate through and output category tree records
+						foreach (array_keys($categoryTreesRecordIndex) as $keyCategoryTreeID)
+						{
+							$categoryTreeRecord = $categoryTreesRecordIndex[$keyCategoryTreeID];
+						
+							//output details of the record
+							$resultMessage = $resultMessage."<tr>".
+								"<td>".$categoryTreeRecordNumber."</td>".
+								"<td>".htmlentities($categoryTreeRecord->keyCategoryTreeID)."</td>".
+								"<td>".htmlentities($categoryTreeRecord->categoryTreeCode)."</td>".
+								"<td>".htmlentities($categoryTreeRecord->name)."</td>".
+								"<td>".APIv1Util::markupTextToHTML(htmlentities($categoryTreeRecord->description))."</td>".
+								"<td>".htmlentities($categoryTreeRecord->ordering)."</td>".
+							"</tr>";
+							
+							$categoryTreeRecordNumber++;
+						}
+
+						//output category table headers
+						$resultMessage = $resultMessage.
+							"</table><br/><br/>".
+							"Category Records:".
 							'<table style="width: 100%; display: block; overflow-x: auto;white-space: nowrap;">'.
 								"<tr>".
 									"<th>#</th>".
@@ -220,6 +260,7 @@
 									"<th>Name</th>".
 									"<th>Key Category Parent ID</th>".
 									"<th>Parent Category Code</th>".
+									"<th>Category Tree Code</th>".
 									"<th>Description 1</th>".
 									"<th>Description 2</th>".
 									"<th>Description 3</th>".
@@ -235,10 +276,16 @@
 						{
 							$categoryRecord = $categoriesRecordIndex[$keyCategoryID];
 							$parentCategoryCode = "";
+							$categoryTreeCode = "";
 						
 							//find the parent category that the category may be assigned to
-							if(array_key_exists($categoryRecord->keyCategoryID, $categoriesRecordIndex)){
-								$parentCategoryCode = $categoriesRecordIndex[$categoryRecord->keyCategoryID]->categoryCode;
+							if(array_key_exists($categoryRecord->keyCategoryParentID, $categoriesRecordIndex)){
+								$parentCategoryCode = $categoriesRecordIndex[$categoryRecord->keyCategoryParentID]->categoryCode;
+							}
+
+							//find the category tree that the category may be assigned to
+							if(array_key_exists($categoryRecord->keyCategoryTreeID, $categoryTreesRecordIndex)){
+								$categoryTreeCode = $categoryTreesRecordIndex[$categoryRecord->keyCategoryTreeID]->categoryTreeCode;
 							}
 						
 							//output details of the record
@@ -247,8 +294,9 @@
 								"<td>".htmlentities($categoryRecord->keyCategoryID)."</td>".
 								"<td>".htmlentities($categoryRecord->categoryCode)."</td>".
 								"<td>".htmlentities($categoryRecord->name)."</td>".
-								"<td>".htmlentities($categoryRecord->KeyCategoryParentID)."</td>".
+								"<td>".htmlentities($categoryRecord->keyCategoryParentID)."</td>".
 								"<td>".htmlentities($parentCategoryCode)."</td>".
+								"<td>".htmlentities($categoryTreeCode)."</td>".
 								"<td>".APIv1Util::markupTextToHTML(htmlentities($categoryRecord->description1))."</td>".
 								"<td>".APIv1Util::markupTextToHTML(htmlentities($categoryRecord->description2))."</td>".
 								"<td>".APIv1Util::markupTextToHTML(htmlentities($categoryRecord->description3))."</td>".
