@@ -147,6 +147,7 @@ Other examples exist in this repository's examples folder on how to retrieve ser
  - Retrieve Maker Models [APIv1ExampleRunnerRetrieveOrgESDDataMakerModels.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataMakerModels.php)
  - Retrieve Maker Model Mappings [APIv1ExampleRunnerRetrieveOrgESDDataMakerModelMappings.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataMakerModelMappings.php)
  - Retrieve Products [APIv1ExampleRunnerRetrieveOrgESDDataProducts.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProducts.php)
+ - Retrieve Product Pricing [APIv1ExampleRunnerRetrieveOrgESDDataProductPricing.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProductPricing.php)
  - Retrieve Product Images [APIv1ExampleRunnerRetrieveOrgESDDataProductImages.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProductImages.php)
  - Retrieve Product Combinations [APIv1ExampleRunnerRetrieveOrgESDDataProductCombinations.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProductCombinations.php)
 

@@ -59,9 +59,10 @@
 		* @param recordsMaxAmount maximum number of records to obtain from the platform
 		* @param recordsStartIndex index containing the position of records to start obtaining from the server
 		* @param recordsUpdatedAfterDateTimeMilliseconds optionally limit to only retrieving records that were updated after the given date time. Provide date time in milliseconds since the 01-01-1970 12am UTC epoch, else set to 0 to obtain all records
+		* @param getRecommendedRetailPricing if true if 'Y' and the retrieveTypeID is set to obtaining product pricing, then retrieve only product recommended retail pricing (RRP)
 		* @return APIv1EndpointResponseESD response from calling the API endpoint
 		*/
-		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds = self::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS)
+		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds = self::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS, $getRecommendedRetailPricing = false)
 		{
 			$requestHeaders = array();
 			$endpointResponse = new APIv1EndpointResponseESD();
@@ -70,7 +71,7 @@
 			
 			try{
 				//set endpoint parameters
-				$endpointParams = "data_type_id=".$retrieveTypeID."&supplier_org_id=".urlencode(utf8_encode($supplierOrgID))."&customer_account_code=".urlencode(utf8_encode($customerAccountCode))."&records_max_amount=".$recordsMaxAmount."&records_start_index=".$recordsStartIndex."&records_updated_after_date_time=".$recordsUpdatedAfterDateTimeMilliseconds;
+				$endpointParams = "data_type_id=".$retrieveTypeID."&supplier_org_id=".urlencode(utf8_encode($supplierOrgID))."&customer_account_code=".urlencode(utf8_encode($customerAccountCode))."&records_max_amount=".$recordsMaxAmount."&records_start_index=".$recordsStartIndex."&records_updated_after_date_time=".$recordsUpdatedAfterDateTimeMilliseconds.($getRecommendedRetailPricing == true? "&get_recommended_retail_pricing=Y": "");
 				
 				//set the class to use to deserialise the ecommerce standards documents that has been returned from the platform's API
 				switch($retrieveTypeID){
@@ -135,7 +136,7 @@
 					if(strcasecmp($endpointResponse->result, APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS) != 0)
 					{
 						//check if the session still exists
-						if(strcasecmp($endpointResponse->result, APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_SESSION_INVALID) != 0){
+						if(strcasecmp($endpointResponse->result_code, APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_SESSION_INVALID) == 0){
 							//mark that the session has expired
 							$apiOrgSession->markSessionExpired();
 						}

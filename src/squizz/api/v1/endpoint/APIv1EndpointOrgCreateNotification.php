@@ -89,7 +89,7 @@
 				if(strcasecmp($endpointResponse->result, APIv1EndpointResponse::ENDPOINT_RESULT_SUCCESS) != 0)
 				{
 					//check if the session still exists
-					if(strcasecmp($endpointResponse->result, APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_SESSION_INVALID) != 0){
+					if(strcasecmp($endpointResponse->result_code, APIv1EndpointResponse::ENDPOINT_RESULT_CODE_ERROR_SESSION_INVALID) == 0){
 						//mark that the session has expired
 						$apiOrgSession->markSessionExpired();
 					}
