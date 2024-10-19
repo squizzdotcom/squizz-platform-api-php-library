@@ -79,7 +79,8 @@
 					$orgAPIKey = $_GET["orgAPIKey"];
 					$orgAPIPass = $_GET["orgAPIPass"];
 					$supplierOrgID = $_GET["supplierOrgID"];
-					$customerAccountCode = '';
+					$customerAccountCode = $_GET["customerAccountCode"];
+					$priceType = $_GET["priceType"];
 					$sessionTimeoutMilliseconds = 60000;
 					$recordsMaxAmount = 5000;
 					$recordsStartIndex = 0;
@@ -224,7 +225,7 @@
 							while($getMoreRecords)
 							{
 								//call the platform's API to retrieve the organisation's product pricing data
-								$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRICING, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds, $getRecommendedRetailPricing);
+								$endpointResponseESD = APIv1EndpointOrgRetrieveESDocument::call($apiOrgSession, $timeoutMilliseconds, APIv1EndpointOrgRetrieveESDocument::RETRIEVE_TYPE_ID_PRICING, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds, $getRecommendedRetailPricing, $priceType);
 								$getMoreRecords = false;
 								$esDocument = $endpointResponseESD->esDocument;
 					

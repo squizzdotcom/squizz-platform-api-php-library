@@ -25,6 +25,7 @@
 	use EcommerceStandardsDocuments\ESDocumentMakerModel;
 	use EcommerceStandardsDocuments\ESDocumentMakerModelMapping;
 	use EcommerceStandardsDocuments\ESDocumentImage;
+	use EcommerceStandardsDocuments\ESDocumentCustomerAccountContract;
 	use \JsonMapper;
 
 	/**
@@ -40,9 +41,16 @@
 		const RETRIEVE_TYPE_ID_PRODUCT_STOCK = 10;
 		const RETRIEVE_TYPE_ID_PRODUCT_IMAGE = 12;
 		const RETRIEVE_TYPE_ID_ATTRIBUTES = 11;
+		const RETRIEVE_TYPE_ID_CUSTOMER_CONTRACTS = 19;
 		const RETRIEVE_TYPE_ID_MAKERS = 44;
 		const RETRIEVE_TYPE_ID_MAKER_MODELS = 45;
 		const RETRIEVE_TYPE_ID_MAKER_MODEL_MAPPINGS = 46;
+
+		// defines the types of pricing records than can be retrieved
+		const RETRIEVE_PRICE_TYPE_CUSTOMER_ACCOUNT_PRICING = "customer_account_pricing";
+		const RETRIEVE_PRICE_TYPE_PRICE_LEVEL_UNIT_PRICING = "price_level_unit_pricing";
+		const RETRIEVE_PRICE_TYPE_PRICE_LEVEL_QUANTITY_PRICING = "price_level_quantity_pricing";
+		const RETRIEVE_PRICE_TYPE_PRICE_GROUPS = "price_groups";
 
 		/**
 		* @var int date time in milliseconds that indicates to retrieve all records and not filter records
@@ -60,9 +68,10 @@
 		* @param recordsStartIndex index containing the position of records to start obtaining from the server
 		* @param recordsUpdatedAfterDateTimeMilliseconds optionally limit to only retrieving records that were updated after the given date time. Provide date time in milliseconds since the 01-01-1970 12am UTC epoch, else set to 0 to obtain all records
 		* @param getRecommendedRetailPricing if true if 'Y' and the retrieveTypeID is set to obtaining product pricing, then retrieve only product recommended retail pricing (RRP)
+		* @param priceType indicates the types of pricing recors to obtain if the retrieveTypeID is set to obtaining product pricing and an organisation is retrieving their own pricing data. It can be set to either customer_account_pricing (default), price_level_unit_pricing, price_level_quantity_pricing, price_groups
 		* @return APIv1EndpointResponseESD response from calling the API endpoint
 		*/
-		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds = self::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS, $getRecommendedRetailPricing = false)
+		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $retrieveTypeID, $supplierOrgID, $customerAccountCode, $recordsMaxAmount, $recordsStartIndex, $recordsUpdatedAfterDateTimeMilliseconds = self::RETRIEVE_ALL_RECORDS_DATE_TIME_MILLISECONDS, $getRecommendedRetailPricing = false, $priceType = "")
 		{
 			$requestHeaders = array();
 			$endpointResponse = new APIv1EndpointResponseESD();
@@ -71,7 +80,7 @@
 			
 			try{
 				//set endpoint parameters
-				$endpointParams = "data_type_id=".$retrieveTypeID."&supplier_org_id=".urlencode(utf8_encode($supplierOrgID))."&customer_account_code=".urlencode(utf8_encode($customerAccountCode))."&records_max_amount=".$recordsMaxAmount."&records_start_index=".$recordsStartIndex."&records_updated_after_date_time=".$recordsUpdatedAfterDateTimeMilliseconds.($getRecommendedRetailPricing == true? "&get_recommended_retail_pricing=Y": "");
+				$endpointParams = "data_type_id=".$retrieveTypeID."&supplier_org_id=".urlencode(utf8_encode($supplierOrgID))."&customer_account_code=".urlencode(utf8_encode($customerAccountCode))."&records_max_amount=".$recordsMaxAmount."&records_start_index=".$recordsStartIndex."&records_updated_after_date_time=".$recordsUpdatedAfterDateTimeMilliseconds.($getRecommendedRetailPricing == true? "&get_recommended_retail_pricing=Y": "").(trim($priceType) != ""? "&price_type=".$priceType: "");
 				
 				//set the class to use to deserialise the ecommerce standards documents that has been returned from the platform's API
 				switch($retrieveTypeID){
@@ -95,6 +104,9 @@
 						break;
 					case self::RETRIEVE_TYPE_ID_ATTRIBUTES:
 						$deserializeESDDocument = new ESDocumentAttribute();
+						break;
+					case self::RETRIEVE_TYPE_ID_CUSTOMER_CONTRACTS:
+						$deserializeESDDocument = new ESDocumentCustomerAccountContract();
 						break;
 					case self::RETRIEVE_TYPE_ID_MAKERS:
 						$deserializeESDDocument = new ESDocumentMaker();

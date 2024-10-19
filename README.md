@@ -150,6 +150,7 @@ Other examples exist in this repository's examples folder on how to retrieve ser
  - Retrieve Product Pricing [APIv1ExampleRunnerRetrieveOrgESDDataProductPricing.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProductPricing.php)
  - Retrieve Product Images [APIv1ExampleRunnerRetrieveOrgESDDataProductImages.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProductImages.php)
  - Retrieve Product Combinations [APIv1ExampleRunnerRetrieveOrgESDDataProductCombinations.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataProductCombinations.php)
+ - Retrieve Customer Contracts [APIv1ExampleRunnerRetrieveOrgESDDataCustomerContracts.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerRetrieveOrgESDDataCustomerContracts.php)
 
 ```php
 <?php
@@ -1625,7 +1626,7 @@ See the example below on how the call the Send Customer Invoice To Customer endp
 ```php
 	<?php
 		/**
-		* Copyright (C) 2019 Squizz PTY LTD
+		* Copyright (C) Squizz PTY LTD
 		* This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 		* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 		* You should have received a copy of the GNU General Public License along with this program.  If not, see http://www.gnu.org/licenses/.
@@ -2156,6 +2157,8 @@ Other examples exist in this repository's examples folder on how to import serve
  - Import Makers [APIv1ExampleRunnerImportOrgESDDataMakers.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataMakers.php)
  - Import Maker Models [APIv1ExampleRunnerImportOrgESDDataMakerModels.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataMakerModels.php)
  - Import Maker Model Mappings [APIv1ExampleRunnerImportOrgESDDataMakerModelMappings.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataMakerModelMappings.php)
+ - Import Customer Contracts [APIv1ExampleRunnerImportOrgESDDataCustomerContracts.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataCustomerContracts.php)
+ - Import Sales Orders [APIv1ExampleRunnerImportOrgESDDataOrderSales.php](https://github.com/squizzdotcom/squizz-platform-api-php-library/tree/master/test/squizz/api/v1/example/APIv1ExampleRunnerImportOrgESDDataOrderSales.php)
 
 ```php
 <?php
