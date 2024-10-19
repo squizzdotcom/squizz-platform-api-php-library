@@ -64,6 +64,9 @@
 					$orgAPIKey = $_GET["orgAPIKey"];
 					$orgAPIPass = $_GET["orgAPIPass"];
 					$rePriceOrder = $_GET["rePriceOrder"];
+					$supplierOrgID = $_GET["supplierOrgID"];
+					$customerAccountCode = $_GET["customerAccountCode"];
+
 					$sessionTimeoutMilliseconds = 60000;
 					
 					echo "<div>Making a request to the SQUIZZ.com API</div><br/>";
@@ -306,7 +309,7 @@
 						$orderSaleESD = new ESDocumentOrderSale(ESDocumentConstants::RESULT_SUCCESS, "successfully obtained data", $salesOrderRecords, array());
 
 						//send sales order document to the API for importing agqainst the organisation
-						$endpointResponseESD = APIv1EndpointOrgImportSalesOrder::call($apiOrgSession, $timeoutMilliseconds, $orderSaleESD, ($rePriceOrder == ESDocumentConstants::ESD_VALUE_YES));
+						$endpointResponseESD = APIv1EndpointOrgImportSalesOrder::call($apiOrgSession, $timeoutMilliseconds, $orderSaleESD, ($rePriceOrder == ESDocumentConstants::ESD_VALUE_YES), $supplierOrgID, $customerAccountCode);
 						$esDocumentOrderSale = $endpointResponseESD->esDocument;
 						
 						//check the result of importing the sales order

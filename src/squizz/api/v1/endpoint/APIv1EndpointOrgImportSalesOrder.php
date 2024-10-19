@@ -30,16 +30,18 @@
 		* @param endpointTimeoutMilliseconds amount of milliseconds to wait after calling the the API before giving up, set a positive number
 		* @param esDocumentOrderSale Sales Order Ecommerce Standards Document that contains one or more sales order records
 		* @param repriceOrder if true then allow the order lines and surcharges to be repriced on import		
+		* @param supplierOrgID unique ID of the supplier organisation in the SQUIZZ.com platform to import the sales order to
+		* @param customerAccountCode code of the supplier organisation's customer account. Customer account only needs to be set if the importing organisation has been assigned to multiple accounts of the supplying organisation, and indicates which customer account to assign the order to
 		* @return response from calling the API endpoint containing a Ecommerce Standards Document enclosed within it
 		*/
-		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $esDocumentOrderSale, $repriceOrder)
+		public static function call($apiOrgSession, $endpointTimeoutMilliseconds, $esDocumentOrderSale, $repriceOrder, $supplierOrgID = "", $customerAccountCode = "")
 		{
 			$requestHeaders = array();
 			$endpointResponse = new APIv1EndpointResponseESD();
 			
 			try{
 				//set notification parameters
-				$endpointParams = "reprice_order=".($repriceOrder? ESDocumentConstants::ESD_VALUE_YES: ESDocumentConstants::ESD_VALUE_NO);
+				$endpointParams = "reprice_order=".($repriceOrder? ESDocumentConstants::ESD_VALUE_YES: ESDocumentConstants::ESD_VALUE_NO).(trim($supplierOrgID) != ""? "&supplier_org_id=".urlencode(utf8_encode($supplierOrgID)): "").(trim($customerAccountCode) != ""? "&customer_account_code=".urlencode(utf8_encode($customerAccountCode)): "");
 				
 				//set function used to read the response from the endpoint
 				$endpointJSONReader = function($jsonArray, $endpointResponse){
